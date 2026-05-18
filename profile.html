@@ -18,10 +18,11 @@
                 <li><a href="gardeners.html">Gardeners</a></li>
                 <li><a href="jobs.html">Jobs</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li><a href="faq.html">FAQ</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
             <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
                 <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
@@ -57,11 +58,30 @@
         </div>
         <p class="profile-name" id="display-name"></p>
         <p class="profile-role" id="display-role"></p>
-        <form onsubmit="saveProfile(event)">
-            <input type="text" id="field-location" placeholder="Your location (e.g. Compiègne)">
-            <input type="email" id="field-contact" placeholder="Contact email (shown on your profile)">
+        <form onsubmit="saveProfile(event)" style="text-align:left;">
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Full Name</label>
+            <input type="text" id="field-name" placeholder="Your full name" required>
+
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Login Email</label>
+            <input type="email" id="field-email" placeholder="Your email" disabled style="opacity:0.5;cursor:not-allowed;">
+            <p style="font-size:12px;color:#94a3b8;margin-top:-10px;margin-bottom:14px;">To change your email, contact us at ciril8596@gmail.com</p>
+
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">I am a</label>
+            <select id="field-role">
+                <option value="gardener">🌱 Young Gardener (looking for jobs)</option>
+                <option value="client">🏡 Client (looking for help)</option>
+            </select>
+
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Location</label>
+            <input type="text" id="field-location" placeholder="e.g. Compiègne">
+
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Public Contact Email</label>
+            <input type="email" id="field-contact" placeholder="Shown on your profile to other users">
+
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Bio</label>
             <textarea id="field-bio" placeholder="Write a short bio about yourself..."></textarea>
-            <button type="submit" class="save-btn">💾 Save Profile</button>
+
+            <button type="submit" class="save-btn">💾 Save Changes</button>
         </form>
         <p class="success-msg" id="success-msg">✅ Profile saved!</p>
     </div>
@@ -112,11 +132,14 @@
                 document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';
                 document.getElementById('display-name').textContent=data.name;
                 document.getElementById('display-role').textContent=data.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+                document.getElementById('field-name').value=data.name||'';
+                document.getElementById('field-email').value=user.email||'';
+                document.getElementById('field-role').value=data.role||'gardener';
                 document.getElementById('field-location').value=data.location||'';
                 document.getElementById('field-contact').value=data.contactEmail||data.email||'';
                 document.getElementById('field-bio').value=data.bio||'';
                 document.getElementById('profile-pic').src=data.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2c5f2e&color=fff&size=110`;
-                if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';
+                if(user.email==='ciril8596@gmail.com')document.getElementById('admin-nav-btn').style.display='inline';
             }
             updateBadge(user.uid);
             loadMyPosts(user.uid);
@@ -142,7 +165,11 @@
         e.preventDefault();if(!currentUser)return;
         let photoURL=null;
         if(pendingPhotoFile){try{const sr=ref(storage,`profile-pictures/${currentUser.uid}`);await uploadBytes(sr,pendingPhotoFile);photoURL=await getDownloadURL(sr);}catch(err){console.log('Photo upload failed:',err);}}
-        const updates={location:document.getElementById('field-location').value,contactEmail:document.getElementById('field-contact').value,bio:document.getElementById('field-bio').value};
+        const newName=document.getElementById('field-name').value;
+        const updates={name:newName,role:document.getElementById('field-role').value,location:document.getElementById('field-location').value,contactEmail:document.getElementById('field-contact').value,bio:document.getElementById('field-bio').value};
+        document.getElementById('display-name').textContent=newName;
+        document.getElementById('display-role').textContent=updates.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+        document.getElementById('welcome-msg').textContent='Hi, '+newName+'!';
         if(photoURL)updates.photoURL=photoURL;
         await updateDoc(doc(db,"users",currentUser.uid),updates);
         const s=document.getElementById('success-msg');s.style.display='block';setTimeout(()=>s.style.display='none',3000);pendingPhotoFile=null;
