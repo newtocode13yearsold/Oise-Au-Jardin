@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header{background:linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url("./images/lawn.jpg");background-size:cover;background-position:center;}
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <img src="images/logo.png" alt="Oise au Jardin" class="logo-img" onclick="location.href='index.html'">
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li class="nav-divider"></li>
+            </ul>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span class="welcome-msg" id="welcome-msg"></span>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </li>
+            <div class="translate-wrap">
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <div class="translate-dropdown" id="translate-dropdown">
+                    <a onclick="setLang('en')">🇬🇧 English</a>
+                    <a onclick="setLang('fr')">🇫🇷 Français</a>
+                    <a onclick="setLang('es')">🇪🇸 Español</a>
+                    <a onclick="setLang('de')">🇩🇪 Deutsch</a>
+                    <a onclick="setLang('it')">🇮🇹 Italiano</a>
+                    <a onclick="setLang('nl')">🇳🇱 Nederlands</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <h1>🏡 Gardening Jobs</h1>
+    <p>Browse jobs posted by clients looking for help</p>
+</div>
+
+<div class="filter-section">
+    <h3>🔍 Search & Filter Jobs</h3>
+    <div class="filter-bar">
+        <div class="filter-group"><label>Location</label><input type="text" id="filter-location" placeholder="e.g. Senlis..."></div>
+        <div class="filter-group"><label>Job type</label>
+            <select id="filter-type">
+                <option value="">Any job type</option>
+                <option>Lawn mowing</option><option>Weeding</option><option>Hedge trimming</option>
+                <option>Pruning</option><option>Planting</option><option>Leaf collection</option>
+                <option>Watering</option><option>General tidy</option><option>Other</option>
+            </select>
+        </div>
+        <div class="filter-group"><label>Max budget (€)</label><input type="number" id="filter-max-budget" placeholder="e.g. 100"></div>
+        <div class="filter-buttons">
+            <button class="filter-btn" onclick="applyFilters()">🔍 Search</button>
+            <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="section-content">
+    <div style="max-width:1100px;margin:0 auto;">
+        <p class="filter-results" id="filter-results"></p>
+        <button class="post-btn" onclick="openPostModal()">+ Post a Job</button>
+        <p class="login-warning" id="login-warning"></p>
+        <div class="cards-grid" id="jobs-list"><p class="empty-msg">Loading jobs...</p></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="postModal">
+    <div class="modal-card">
+        <button class="close-btn" onclick="closePostModal()">✕</button>
+        <h2>Post a Gardening Job</h2>
+        <form onsubmit="submitJob(event)">
+            <input type="text" id="j-location" placeholder="Location (e.g. Senlis)" required>
+
+            <label style="font-size:13px;color:#666;font-weight:600;display:block;margin-bottom:8px;">Select all tasks needed:</label>
+            <div class="task-chips" id="task-chips">
+                <span class="task-chip" onclick="toggleTask(this,'Lawn mowing')">🌿 Lawn mowing</span>
+                <span class="task-chip" onclick="toggleTask(this,'Weeding')">🌱 Weeding</span>
+                <span class="task-chip" onclick="toggleTask(this,'Hedge trimming')">✂️ Hedge trimming</span>
+                <span class="task-chip" onclick="toggleTask(this,'Pruning')">🌳 Pruning</span>
+                <span class="task-chip" onclick="toggleTask(this,'Planting')">🌸 Planting</span>
+                <span class="task-chip" onclick="toggleTask(this,'Leaf collection')">🍂 Leaf collection</span>
+                <span class="task-chip" onclick="toggleTask(this,'Watering')">💧 Watering</span>
+                <span class="task-chip" onclick="toggleTask(this,'General tidy')">🧹 General tidy</span>
+                <span class="task-chip" onclick="toggleTask(this,'Other')">➕ Other</span>
+            </div>
+            <p id="task-error" style="color:#e74c3c;font-size:13px;display:none;margin-bottom:10px;">Please select at least one task.</p>
+
+            <div class="land-size-group" id="land-size-group">
+                <label>🏞 How big is the area to mow?</label>
+                <select id="j-land-size">
+                    <option value="">Select size...</option>
+                    <option value="Small (under 50m²)">Small — under 50m²</option>
+                    <option value="Medium (50–150m²)">Medium — 50 to 150m²</option>
+                    <option value="Large (150–300m²)">Large — 150 to 300m²</option>
+                    <option value="Very large (300m²+)">Very large — over 300m²</option>
+                </select>
+            </div>
+
+            <input type="date" id="j-date" required>
+            <input type="number" id="j-budget" placeholder="Budget (€)" required min="1">
+            <textarea id="j-description" placeholder="Describe what you need in more detail..." rows="3" required></textarea>
+            <button type="submit" class="btn">Post Job</button>
+        </form>
+    </div>
+</div>
+
+<div class="profile-popup" id="profilePopup">
+    <div class="profile-popup-card">
+        <button class="close-btn" onclick="closeProfilePopup()">✕</button>
+        <img id="popup-pic" src="" alt="">
+        <h2 id="popup-name"></h2>
+        <p class="role" id="popup-role"></p>
+        <p class="info-row" id="popup-location"></p>
+        <p class="info-row" id="popup-contact"></p>
+        <div class="bio" id="popup-bio"></div>
+        <button id="msg-btn" style="margin-top:14px;width:100%;padding:10px;background:#2c5f2e;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:none;" onclick="goToChat()">💬 Send Message</button>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
+        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, orderBy, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+    let currentUser=null,currentRole=null,currentProfileUserId=null,allJobs=[],selectedTasks=[];
+
+    async function updateBadge(uid){
+        const q=query(collection(db,"chats"),where("participants","array-contains",uid));
+        onSnapshot(q,async snap=>{
+            let n=0;for(const d of snap.docs){const m=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",uid),where("read","==",false)));n+=m.size;}
+            const b=document.getElementById('msg-badge');if(b){b.style.display=n>0?'inline-block':'none';b.textContent=n>99?'99+':n;}
+        });
+    }
+
+    onAuthStateChanged(auth,async user=>{
+        if(user){
+            currentUser=user;
+            const d=await getDoc(doc(db,"users",user.uid));
+            if(d.exists()){const data=d.data();currentRole=data.role;document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';}
+            document.getElementById('btn-login').style.display='none';
+            document.getElementById('btn-signup').style.display='none';
+            document.getElementById('btn-logout').style.display='flex';
+            updateBadge(user.uid);
+        }else{
+            currentUser=null;currentRole=null;
+            document.getElementById('btn-login').style.display='inline';
+            document.getElementById('btn-signup').style.display='inline';
+            document.getElementById('btn-logout').style.display='none';
+        }
+        loadJobs();
+    });
+
+    window.toggleTask=function(el,task){
+        el.classList.toggle('selected');
+        if(el.classList.contains('selected'))selectedTasks.push(task);
+        else selectedTasks=selectedTasks.filter(t=>t!==task);
+        const lg=document.getElementById('land-size-group');
+        if(selectedTasks.includes('Lawn mowing'))lg.classList.add('show');
+        else{lg.classList.remove('show');document.getElementById('j-land-size').value='';}
+    }
+
+    async function loadJobs(){
+        const list=document.getElementById('jobs-list');
+        list.innerHTML='<p class="empty-msg">Loading...</p>';
+        const snap=await getDocs(query(collection(db,"jobs"),orderBy("createdAt","desc")));
+        allJobs=[];
+        if(snap.empty){list.innerHTML='<p class="empty-msg">No jobs posted yet.</p>';return;}
+        for(const d of snap.docs){
+            const data=d.data();
+            let pic=`https://ui-avatars.com/api/?name=Client&background=2c5f2e&color=fff&size=55`,posterName='Client';
+            if(data.postedBy){try{const u=await getDoc(doc(db,"users",data.postedBy));if(u.exists()){const ud=u.data();posterName=ud.name;pic=ud.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(ud.name)}&background=2c5f2e&color=fff&size=55`;}}catch(e){}}
+            allJobs.push({id:d.id,...data,pic,posterName});
+        }
+        renderJobs(allJobs);
+    }
+
+    function renderJobs(jobs){
+        const list=document.getElementById('jobs-list');
+        const res=document.getElementById('filter-results');
+        list.innerHTML='';
+        if(jobs.length===0){list.innerHTML='<p class="empty-msg">No jobs match your filters.</p>';res.textContent='0 results';return;}
+        res.textContent=jobs.length===allJobs.length?'':`${jobs.length} result${jobs.length!==1?'s':''} found`;
+        jobs.forEach(d=>{
+            const isOwner=currentUser&&currentUser.uid===d.postedBy;
+            const tasks=Array.isArray(d.tasks)?d.tasks:[d.jobType||''];
+            const tasksHTML=tasks.filter(Boolean).map(t=>`<span style="display:inline-block;background:#e8f5e9;color:#2c5f2e;padding:2px 10px;border-radius:12px;font-size:12px;margin:2px;font-weight:500;">${t}</span>`).join('');
+            const el=document.createElement('div');el.className='card';
+            el.innerHTML=`
+                <div class="card-header">
+                    <img class="card-pic" src="${d.pic}" alt="${d.posterName}">
+                    <div><h3>${d.posterName}</h3><p class="location">📍 ${d.location}</p></div>
+                </div>
+                <div style="margin-bottom:8px;line-height:1.8;">${tasksHTML}</div>
+                ${d.landSize?`<p style="font-size:13px;color:#555;margin-bottom:6px;">🏞 ${d.landSize}</p>`:''}
+                <p class="budget">Budget: €${d.budget}</p>
+                <p class="date">📅 Needed by: ${d.date}</p>
+                <p class="description">${d.description}</p>
+                <div class="card-actions">
+                    <button class="view-profile-btn" onclick="viewProfile('${d.postedBy}')">👤 View Profile</button>
+                    ${isOwner?`<button class="delete-card-btn" onclick="deletePost('${d.id}')">🗑 Delete</button>`:''}
+                </div>
+                <div class="comments-section">
+                    <h4>💬 Comments</h4>
+                    <div id="comments-${d.id}"></div>
+                    ${currentUser?`<div class="comment-form"><input type="text" id="ci-${d.id}" placeholder="Add a comment..."><button onclick="addComment('jobs','${d.id}')">Post</button></div>`:'<p style="font-size:12px;color:#bbb;">Log in to comment</p>'}
+                </div>`;
+            list.appendChild(el);loadComments('jobs',d.id);
+        });
+    }
+
+    window.applyFilters=function(){
+        const loc=document.getElementById('filter-location').value.toLowerCase().trim();
+        const type=document.getElementById('filter-type').value;
+        const max=document.getElementById('filter-max-budget').value?parseFloat(document.getElementById('filter-max-budget').value):Infinity;
+        renderJobs(allJobs.filter(j=>{
+            if(loc&&!(j.location||'').toLowerCase().includes(loc))return false;
+            if(type){const tasks=Array.isArray(j.tasks)?j.tasks:[j.jobType||''];if(!tasks.some(t=>t===type))return false;}
+            if(parseFloat(j.budget)>max)return false;
+            return true;
+        }));
+    }
+    window.clearFilters=function(){
+        ['filter-location','filter-type','filter-max-budget'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('filter-results').textContent='';
+        renderJobs(allJobs);
+    }
+
+    async function loadComments(col,postId){
+        const c=document.getElementById(`comments-${postId}`);if(!c)return;
+        const snap=await getDocs(query(collection(db,col,postId,"comments"),orderBy("createdAt","asc")));
+        c.innerHTML='';
+        if(snap.empty){c.innerHTML='<p style="font-size:12px;color:#ccc;">No comments yet.</p>';return;}
+        snap.forEach(d=>{const x=d.data();c.innerHTML+=`<div class="comment"><div class="comment-author">${x.authorName}</div><div class="comment-text">${x.text}</div></div>`;});
+    }
+    window.addComment=async function(col,postId){
+        if(!currentUser)return;
+        const input=document.getElementById(`ci-${postId}`);const text=input.value.trim();if(!text)return;
+        const ud=await getDoc(doc(db,"users",currentUser.uid));
+        await addDoc(collection(db,col,postId,"comments"),{text,authorName:ud.exists()?ud.data().name:'User',authorId:currentUser.uid,createdAt:new Date()});
+        input.value='';loadComments(col,postId);
+    }
+    window.deletePost=async function(id){if(!confirm('Delete?'))return;await deleteDoc(doc(db,"jobs",id));loadJobs();}
+    window.viewProfile=async function(userId){
+        if(!userId||userId==='undefined'){alert('Profile not available.');return;}
+        currentProfileUserId=userId;
+        try{
+            const d=await getDoc(doc(db,"users",userId));
+            if(!d.exists()){alert('Profile not found.');return;}
+            const data=d.data();
+            document.getElementById('popup-pic').src=data.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(data.name||'User')}&background=2c5f2e&color=fff&size=90`;
+            document.getElementById('popup-name').textContent=data.name||'Unknown';
+            document.getElementById('popup-role').textContent=data.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+            document.getElementById('popup-location').textContent=data.location?'📍 '+data.location:'📍 Location not set';
+            document.getElementById('popup-contact').textContent=data.contactEmail?'✉️ '+data.contactEmail:'';
+            document.getElementById('popup-bio').textContent=data.bio||'No bio yet.';
+            document.getElementById('msg-btn').style.display=(currentUser&&currentUser.uid!==userId)?'block':'none';
+            document.getElementById('profilePopup').classList.add('active');
+        }catch{alert('Could not load profile.');}
+    }
+    window.closeProfilePopup=function(){document.getElementById('profilePopup').classList.remove('active');}
+    window.goToChat=function(){if(!currentUser){location.href='index.html';return;}location.href=`chat.html?with=${currentProfileUserId}`;}
+    window.openPostModal=function(){
+        if(!currentUser){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='You must be logged in to post.';return;}
+        if(currentRole!=='client'){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='Only clients can post jobs.';return;}
+        document.getElementById('login-warning').style.display='none';
+        selectedTasks=[];
+        document.querySelectorAll('.task-chip').forEach(c=>c.classList.remove('selected'));
+        document.getElementById('land-size-group').classList.remove('show');
+        document.getElementById('postModal').classList.add('active');
+    }
+    window.closePostModal=function(){document.getElementById('postModal').classList.remove('active');}
+    window.submitJob=async function(e){
+        e.preventDefault();
+        if(selectedTasks.length===0){document.getElementById('task-error').style.display='block';return;}
+        document.getElementById('task-error').style.display='none';
+        await addDoc(collection(db,"jobs"),{location:document.getElementById('j-location').value,tasks:selectedTasks,jobType:selectedTasks[0],landSize:document.getElementById('j-land-size').value||null,date:document.getElementById('j-date').value,budget:document.getElementById('j-budget').value,description:document.getElementById('j-description').value,postedBy:currentUser.uid,createdAt:new Date()});
+        closePostModal();loadJobs();
+    }
+    window.logout=async function(){await signOut(auth);location.href='index.html';}
+</script>
+<script>
+    function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
+    function toggleTranslate(){document.getElementById('translate-dropdown').classList.toggle('open');}
+    function setLang(lang){localStorage.setItem('preferredLang',lang);const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};document.getElementById('current-lang').textContent=labels[lang];document.getElementById('translate-dropdown').classList.remove('open');setTimeout(()=>{const s=document.querySelector('.goog-te-combo');if(s){s.value=lang;s.dispatchEvent(new Event('change'));}},500);}
+    document.addEventListener('click',function(e){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');if(m&&!m.contains(e.target)&&!h.contains(e.target)){m.classList.remove('open');h.classList.remove('open');}const tw=document.querySelector('.translate-wrap');if(tw&&!tw.contains(e.target))document.getElementById('translate-dropdown').classList.remove('open');});
+    window.addEventListener('load',()=>{const s=localStorage.getItem('preferredLang');const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};if(s){document.getElementById('current-lang').textContent=labels[s];setTimeout(()=>{const g=document.querySelector('.goog-te-combo');if(g){g.value=s;g.dispatchEvent(new Event('change'));}},1500);}});
+</script>
+<div style="display:none;" id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

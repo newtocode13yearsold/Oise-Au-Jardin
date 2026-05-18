@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gardeners - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .page-header { background: linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url("./images/lawn.jpg"); background-size:cover; background-position:center; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <img src="images/logo.png" alt="Oise au Jardin" class="logo-img" onclick="location.href='index.html'">
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li class="nav-divider"></li>
+            </ul>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-logout" style="display:none; list-style:none; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span class="welcome-msg" id="welcome-msg"></span>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </li>
+            <div class="translate-wrap">
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <div class="translate-dropdown" id="translate-dropdown">
+                    <a onclick="setLang('en')">🇬🇧 English</a>
+                    <a onclick="setLang('fr')">🇫🇷 Français</a>
+                    <a onclick="setLang('es')">🇪🇸 Español</a>
+                    <a onclick="setLang('de')">🇩🇪 Deutsch</a>
+                    <a onclick="setLang('it')">🇮🇹 Italiano</a>
+                    <a onclick="setLang('nl')">🇳🇱 Nederlands</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="page-header">
+    <h1>🌱 Find a Gardener</h1>
+    <p>Browse young gardeners available in your area</p>
+</div>
+
+<div class="filter-section">
+    <h3>🔍 Search & Filter Gardeners</h3>
+    <div class="filter-bar">
+        <div class="filter-group"><label>Location</label><input type="text" id="filter-location" placeholder="e.g. Compiègne..."></div>
+        <div class="filter-group"><label>Service type</label><input type="text" id="filter-service" placeholder="e.g. mowing, weeding..."></div>
+        <div class="filter-group"><label>Max price/hr (€)</label><input type="number" id="filter-max-price" placeholder="e.g. 15"></div>
+        <div class="filter-group"><label>Min rating</label>
+            <select id="filter-stars">
+                <option value="">Any rating</option>
+                <option value="4">4+ stars ⭐⭐⭐⭐</option>
+                <option value="3">3+ stars ⭐⭐⭐</option>
+                <option value="2">2+ stars ⭐⭐</option>
+            </select>
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn" onclick="applyFilters()">🔍 Search</button>
+            <button class="clear-btn" onclick="clearFilters()">✕ Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="section-content">
+    <div style="max-width:1100px;margin:0 auto;">
+        <p class="filter-results" id="filter-results"></p>
+        <button class="post-btn" onclick="openPostModal()">+ Post Your Availability</button>
+        <p class="login-warning" id="login-warning"></p>
+        <div class="cards-grid" id="gardeners-list"><p class="empty-msg">Loading gardeners...</p></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="postModal">
+    <div class="modal-card">
+        <button class="close-btn" onclick="closePostModal()">✕</button>
+        <h2>Post Your Availability</h2>
+        <form onsubmit="submitGardener(event)">
+            <input type="text" id="g-location" placeholder="Your Location (e.g. Compiègne)" required>
+            <input type="text" id="g-services" placeholder="Services (e.g. mowing, weeding, pruning)" required>
+            <input type="number" id="g-price" placeholder="Price per hour (€)" required min="1">
+            <textarea id="g-description" placeholder="Short description about yourself..." rows="3" required></textarea>
+            <button type="submit" class="btn">Post My Profile</button>
+        </form>
+    </div>
+</div>
+
+<div class="profile-popup" id="profilePopup">
+    <div class="profile-popup-card">
+        <button class="close-btn" onclick="closeProfilePopup()">✕</button>
+        <img id="popup-pic" src="" alt="">
+        <h2 id="popup-name"></h2>
+        <p class="role" id="popup-role"></p>
+        <p class="info-row" id="popup-location"></p>
+        <p class="info-row" id="popup-contact"></p>
+        <div class="bio" id="popup-bio"></div>
+        <button id="msg-btn" style="margin-top:14px;width:100%;padding:10px;background:#2c5f2e;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:none;" onclick="goToChat()">💬 Send Message</button>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
+        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, deleteDoc, orderBy, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+    let currentUser=null,currentRole=null,currentProfileUserId=null,allGardeners=[];
+
+    async function updateBadge(uid){
+        const q=query(collection(db,"chats"),where("participants","array-contains",uid));
+        onSnapshot(q,async snap=>{
+            let n=0;for(const d of snap.docs){const m=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",uid),where("read","==",false)));n+=m.size;}
+            const b=document.getElementById('msg-badge');if(b){b.style.display=n>0?'inline-block':'none';b.textContent=n>99?'99+':n;}
+        });
+    }
+
+    onAuthStateChanged(auth,async user=>{
+        if(user){
+            currentUser=user;
+            const d=await getDoc(doc(db,"users",user.uid));
+            if(d.exists()){const data=d.data();currentRole=data.role;document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';}
+            document.getElementById('btn-login').style.display='none';
+            document.getElementById('btn-signup').style.display='none';
+            document.getElementById('btn-logout').style.display='flex';
+            updateBadge(user.uid);
+        }else{
+            currentUser=null;currentRole=null;
+            document.getElementById('btn-login').style.display='inline';
+            document.getElementById('btn-signup').style.display='inline';
+            document.getElementById('btn-logout').style.display='none';
+        }
+        loadGardeners();
+    });
+
+    async function loadGardeners(){
+        const list=document.getElementById('gardeners-list');
+        list.innerHTML='<p class="empty-msg">Loading...</p>';
+        const snap=await getDocs(query(collection(db,"gardeners"),orderBy("createdAt","desc")));
+        allGardeners=[];
+        if(snap.empty){list.innerHTML='<p class="empty-msg">No gardeners posted yet. Be the first!</p>';return;}
+        for(const d of snap.docs){
+            const data=d.data();
+            const rSnap=await getDocs(collection(db,"gardeners",d.id,"ratings"));
+            let avg=null,count=0,myRating=0;
+            if(!rSnap.empty){let total=0;rSnap.forEach(r=>{total+=r.data().rating;if(currentUser&&r.id===currentUser.uid)myRating=r.data().rating;});count=rSnap.size;avg=(total/count).toFixed(1);}
+            allGardeners.push({id:d.id,...data,avg,count,myRating});
+        }
+        renderGardeners(allGardeners);
+    }
+
+    function starsHTML(avg,count){
+        if(!avg)return'<span style="font-size:12px;color:#ccc;">No ratings yet</span>';
+        const f=Math.round(avg);let s='';for(let i=1;i<=5;i++)s+=i<=f?'★':'☆';
+        return`<span style="color:#f39c12;font-size:15px;">${s}</span><span style="color:#999;font-size:12px;margin-left:4px;">${avg} (${count})</span>`;
+    }
+
+    function renderGardeners(gardeners){
+        const list=document.getElementById('gardeners-list');
+        const res=document.getElementById('filter-results');
+        list.innerHTML='';
+        if(gardeners.length===0){list.innerHTML='<p class="empty-msg">No gardeners match your filters.</p>';res.textContent='0 results';return;}
+        res.textContent=gardeners.length===allGardeners.length?'':`${gardeners.length} result${gardeners.length!==1?'s':''} found`;
+        gardeners.forEach(d=>{
+            const pic=d.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(d.name)}&background=2c5f2e&color=fff&size=55`;
+            const isOwner=currentUser&&currentUser.uid===d.userId;
+            const el=document.createElement('div');el.className='card';
+            el.innerHTML=`
+                <div class="card-header">
+                    <img class="card-pic" src="${pic}" alt="${d.name}">
+                    <div><h3>🌿 ${d.name}</h3><p class="location">📍 ${d.location}</p></div>
+                </div>
+                <div style="margin-bottom:8px;">${starsHTML(d.avg,d.count)}</div>
+                <p class="price">€${d.price}/hr</p>
+                <p class="services">🛠 ${d.services}</p>
+                <p class="description">${d.description}</p>
+                <div class="card-actions">
+                    <button class="view-profile-btn" onclick="viewProfile('${d.userId}')">👤 View Profile</button>
+                    ${isOwner?`<button class="delete-card-btn" onclick="deletePost('${d.id}')">🗑 Delete</button>`:''}
+                </div>
+                ${currentUser&&!isOwner?`
+                <div style="margin-top:12px;border-top:1px solid #f0f0f0;padding-top:10px;">
+                    <p style="font-size:12px;color:#999;margin-bottom:6px;">Rate this gardener:</p>
+                    <div class="star-rating" id="stars-${d.id}">
+                        ${[1,2,3,4,5].map(n=>`<span class="star" style="color:${n<=d.myRating?'#f39c12':'#ddd'}" onmouseover="hoverS('${d.id}',${n})" onmouseout="unhoverS('${d.id}',${d.myRating})" onclick="rateG('${d.id}',${n})">★</span>`).join('')}
+                    </div>
+                    ${d.myRating>0?`<p style="font-size:11px;color:#2c5f2e;margin-top:3px;">Your rating: ${d.myRating}★ ✓</p>`:''}
+                </div>`:''}
+                <div class="comments-section">
+                    <h4>💬 Comments</h4>
+                    <div id="comments-${d.id}"></div>
+                    ${currentUser?`<div class="comment-form"><input type="text" id="ci-${d.id}" placeholder="Add a comment..."><button onclick="addComment('gardeners','${d.id}')">Post</button></div>`:'<p style="font-size:12px;color:#bbb;">Log in to comment</p>'}
+                </div>`;
+            list.appendChild(el);loadComments('gardeners',d.id);
+        });
+    }
+
+    window.applyFilters=function(){
+        const loc=document.getElementById('filter-location').value.toLowerCase().trim();
+        const svc=document.getElementById('filter-service').value.toLowerCase().trim();
+        const maxP=document.getElementById('filter-max-price').value?parseFloat(document.getElementById('filter-max-price').value):Infinity;
+        const minS=document.getElementById('filter-stars').value?parseFloat(document.getElementById('filter-stars').value):0;
+        renderGardeners(allGardeners.filter(g=>{
+            if(loc&&!(g.location||'').toLowerCase().includes(loc))return false;
+            if(svc&&!(g.services||'').toLowerCase().includes(svc))return false;
+            if(parseFloat(g.price)>maxP)return false;
+            if(minS>0&&(!g.avg||parseFloat(g.avg)<minS))return false;
+            return true;
+        }));
+    }
+    window.clearFilters=function(){
+        ['filter-location','filter-service','filter-max-price','filter-stars'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('filter-results').textContent='';
+        renderGardeners(allGardeners);
+    }
+    window.hoverS=function(id,n){document.querySelectorAll(`#stars-${id} .star`).forEach((s,i)=>s.style.color=i<n?'#f39c12':'#ddd');}
+    window.unhoverS=function(id,cur){document.querySelectorAll(`#stars-${id} .star`).forEach((s,i)=>s.style.color=i<cur?'#f39c12':'#ddd');}
+    window.rateG=async function(postId,rating){
+        if(!currentUser){alert('Log in to rate.');return;}
+        await setDoc(doc(db,"gardeners",postId,"ratings",currentUser.uid),{rating,userId:currentUser.uid});
+        document.querySelectorAll(`#stars-${postId} .star`).forEach((s,i)=>s.style.color=i<rating?'#f39c12':'#ddd');
+        loadGardeners();
+    }
+    async function loadComments(col,postId){
+        const c=document.getElementById(`comments-${postId}`);if(!c)return;
+        const snap=await getDocs(query(collection(db,col,postId,"comments"),orderBy("createdAt","asc")));
+        c.innerHTML='';
+        if(snap.empty){c.innerHTML='<p style="font-size:12px;color:#ccc;">No comments yet.</p>';return;}
+        snap.forEach(d=>{const x=d.data();c.innerHTML+=`<div class="comment"><div class="comment-author">${x.authorName}</div><div class="comment-text">${x.text}</div></div>`;});
+    }
+    window.addComment=async function(col,postId){
+        if(!currentUser)return;
+        const input=document.getElementById(`ci-${postId}`);const text=input.value.trim();if(!text)return;
+        const ud=await getDoc(doc(db,"users",currentUser.uid));
+        await addDoc(collection(db,col,postId,"comments"),{text,authorName:ud.exists()?ud.data().name:'User',authorId:currentUser.uid,createdAt:new Date()});
+        input.value='';loadComments(col,postId);
+    }
+    window.deletePost=async function(id){if(!confirm('Delete?'))return;await deleteDoc(doc(db,"gardeners",id));loadGardeners();}
+    window.viewProfile=async function(userId){
+        if(!userId||userId==='undefined'){alert('Profile not available.');return;}
+        currentProfileUserId=userId;
+        try{
+            const d=await getDoc(doc(db,"users",userId));
+            if(!d.exists()){alert('Profile not found.');return;}
+            const data=d.data();
+            const pic=data.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(data.name||'User')}&background=2c5f2e&color=fff&size=90`;
+            document.getElementById('popup-pic').src=pic;
+            document.getElementById('popup-name').textContent=data.name||'Unknown';
+            document.getElementById('popup-role').textContent=data.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+            document.getElementById('popup-location').textContent=data.location?'📍 '+data.location:'📍 Location not set';
+            document.getElementById('popup-contact').textContent=data.contactEmail?'✉️ '+data.contactEmail:'';
+            document.getElementById('popup-bio').textContent=data.bio||'No bio yet.';
+            document.getElementById('msg-btn').style.display=(currentUser&&currentUser.uid!==userId)?'block':'none';
+            document.getElementById('profilePopup').classList.add('active');
+        }catch{alert('Could not load profile.');}
+    }
+    window.closeProfilePopup=function(){document.getElementById('profilePopup').classList.remove('active');}
+    window.goToChat=function(){if(!currentUser){location.href='index.html';return;}location.href=`chat.html?with=${currentProfileUserId}`;}
+    window.openPostModal=function(){
+        if(!currentUser){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='You must be logged in to post.';return;}
+        if(currentRole!=='gardener'){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='Only gardeners can post availability.';return;}
+        document.getElementById('login-warning').style.display='none';
+        document.getElementById('postModal').classList.add('active');
+    }
+    window.closePostModal=function(){document.getElementById('postModal').classList.remove('active');}
+    window.submitGardener=async function(e){
+        e.preventDefault();
+        const ud=await getDoc(doc(db,"users",currentUser.uid));const udata=ud.data();
+        await addDoc(collection(db,"gardeners"),{name:udata.name,photoURL:udata.photoURL||'',location:document.getElementById('g-location').value,services:document.getElementById('g-services').value,price:document.getElementById('g-price').value,description:document.getElementById('g-description').value,userId:currentUser.uid,createdAt:new Date()});
+        closePostModal();loadGardeners();
+    }
+    window.logout=async function(){await signOut(auth);location.href='index.html';}
+</script>
+<script>
+    function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
+    function toggleTranslate(){document.getElementById('translate-dropdown').classList.toggle('open');}
+    function setLang(lang){localStorage.setItem('preferredLang',lang);const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};document.getElementById('current-lang').textContent=labels[lang];document.getElementById('translate-dropdown').classList.remove('open');setTimeout(()=>{const s=document.querySelector('.goog-te-combo');if(s){s.value=lang;s.dispatchEvent(new Event('change'));}},500);}
+    document.addEventListener('click',function(e){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');if(m&&!m.contains(e.target)&&!h.contains(e.target)){m.classList.remove('open');h.classList.remove('open');}const tw=document.querySelector('.translate-wrap');if(tw&&!tw.contains(e.target))document.getElementById('translate-dropdown').classList.remove('open');});
+    window.addEventListener('load',()=>{const s=localStorage.getItem('preferredLang');const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};if(s){document.getElementById('current-lang').textContent=labels[s];setTimeout(()=>{const g=document.querySelector('.goog-te-combo');if(g){g.value=s;g.dispatchEvent(new Event('change'));}},1500);}});
+</script>
+<div style="display:none;" id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

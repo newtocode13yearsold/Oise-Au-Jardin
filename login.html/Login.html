@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(0,0,0,0.40), rgba(0,0,0,0.40)),
+                url("./images/lawn.jpg");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card img {
+            height: 80px;
+            width: auto;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .auth-card h2 {
+            margin-bottom: 24px;
+            color: #2c5f2e;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        .auth-card input:focus {
+            outline: none;
+            border-color: #2c5f2e;
+        }
+
+        .auth-card .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #2c5f2e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .auth-card .btn:hover {
+            background-color: #1e4220;
+        }
+
+        .auth-card p {
+            margin-top: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .auth-card a {
+            color: #2c5f2e;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .auth-card a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            margin-top: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <img src="images/logo.png" alt="Oise au Jardin logo">
+        <h2>Log In</h2>
+
+        <form action="#" method="POST">
+            <input type="email" name="email" placeholder="Your Email" required>
+            <input type="password" name="password" placeholder="Your Password" required>
+            <button type="submit" class="btn">Log In</button>
+        </form>
+
+        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Home</a>
+
+</body>
+</html>

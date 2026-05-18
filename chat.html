@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <img src="images/logo.png" alt="Oise au Jardin" class="logo-img" onclick="location.href='index.html'">
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li class="nav-divider"></li>
+            </ul>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span class="welcome-msg" id="welcome-msg"></span>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </li>
+            <div class="translate-wrap">
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <div class="translate-dropdown" id="translate-dropdown">
+                    <a onclick="setLang('en')">🇬🇧 English</a>
+                    <a onclick="setLang('fr')">🇫🇷 Français</a>
+                    <a onclick="setLang('es')">🇪🇸 Español</a>
+                    <a onclick="setLang('de')">🇩🇪 Deutsch</a>
+                    <a onclick="setLang('it')">🇮🇹 Italiano</a>
+                    <a onclick="setLang('nl')">🇳🇱 Nederlands</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="not-logged-in" id="not-logged-in" style="display:none;">
+    <p>You need to be logged in to use messages.</p>
+    <a href="index.html">← Go back and log in</a>
+</div>
+
+<div class="chat-page" id="chat-page" style="display:none;">
+    <div class="conversations">
+        <h3>💬 Messages</h3>
+        <div class="conv-search">
+            <input type="text" id="conv-search-input" placeholder="Search conversations..." oninput="filterConversations()">
+        </div>
+        <div class="conv-list-inner" id="conv-list">
+            <p class="no-convs">No conversations yet.</p>
+        </div>
+    </div>
+    <div class="chat-window">
+        <div class="chat-placeholder" id="chat-placeholder">
+            <span>💬</span>
+            Select a conversation to start chatting
+        </div>
+        <div id="chat-header" class="chat-header" style="display:none;">
+            <img id="chat-header-pic" src="" alt="">
+            <div>
+                <div class="chat-header-name" id="chat-header-name"></div>
+                <div class="chat-header-status">Active on Oise au Jardin</div>
+            </div>
+        </div>
+        <div class="messages-area" id="messages-area" style="display:none;"></div>
+        <div class="chat-input-area" id="chat-input-area" style="display:none;">
+            <input type="text" id="msg-input" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">Send ➤</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
+        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, query, where, orderBy, onSnapshot, setDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
+    let currentUser=null,currentChatId=null,messagesUnsub=null,allConversations=[];
+
+    async function updateBadge(uid){
+        const q=query(collection(db,"chats"),where("participants","array-contains",uid));
+        onSnapshot(q,async snap=>{
+            let n=0;
+            for(const d of snap.docs){if(d.id===currentChatId)continue;const m=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",uid),where("read","==",false)));n+=m.size;}
+            const b=document.getElementById('msg-badge');if(b){b.style.display=n>0?'inline-block':'none';b.textContent=n>99?'99+':n;}
+        });
+    }
+
+    onAuthStateChanged(auth,async user=>{
+        if(user){
+            currentUser=user;
+            document.getElementById('btn-login').style.display='none';
+            document.getElementById('btn-signup').style.display='none';
+            document.getElementById('btn-logout').style.display='flex';
+            document.getElementById('chat-page').style.display='flex';
+            document.getElementById('not-logged-in').style.display='none';
+            const d=await getDoc(doc(db,"users",user.uid));
+            if(d.exists()){const data=d.data();document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';}
+            const params=new URLSearchParams(window.location.search);
+            const withUser=params.get('with');
+            if(withUser)openChatWith(withUser);
+            loadConversations();
+            updateBadge(user.uid);
+        }else{
+            document.getElementById('chat-page').style.display='none';
+            document.getElementById('not-logged-in').style.display='block';
+        }
+    });
+
+    function getChatId(a,b){return[a,b].sort().join('_');}
+
+    function loadConversations(){
+        const convList=document.getElementById('conv-list');
+        const q=query(collection(db,"chats"),where("participants","array-contains",currentUser.uid));
+        onSnapshot(q,async snap=>{
+            allConversations=[];
+            if(snap.empty){convList.innerHTML='<p class="no-convs">No conversations yet.<br>Click "Message" on a gardener or job to start chatting!</p>';return;}
+            for(const d of snap.docs){
+                const data=d.data();
+                const otherId=data.participants.find(p=>p!==currentUser.uid);
+                try{
+                    const od=await getDoc(doc(db,"users",otherId));
+                    if(!od.exists())continue;
+                    const other=od.data();
+                    const pic=other.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(other.name)}&background=2c5f2e&color=fff&size=42`;
+                    const uSnap=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",currentUser.uid),where("read","==",false)));
+                    allConversations.push({id:d.id,otherId,name:other.name,pic,preview:data.lastMessage||'No messages yet',unread:uSnap.size});
+                }catch(e){}
+            }
+            renderConversations(allConversations);
+        });
+    }
+
+    function renderConversations(convs){
+        const convList=document.getElementById('conv-list');
+        convList.innerHTML='';
+        if(convs.length===0){convList.innerHTML='<p class="no-convs">No conversations found.</p>';return;}
+        convs.forEach(c=>{
+            const el=document.createElement('div');
+            el.className=`conv-item${currentChatId===c.id?' active':''}`;
+            el.onclick=()=>openChat(c.id,c.otherId,c.name,c.pic);
+            el.innerHTML=`
+                <img class="conv-pic" src="${c.pic}" alt="${c.name}">
+                <div class="conv-info">
+                    <div class="conv-name">${c.name}</div>
+                    <div class="conv-preview">${c.preview}</div>
+                </div>
+                ${c.unread>0?`<span class="conv-unread">${c.unread}</span>`:''}`;
+            convList.appendChild(el);
+        });
+    }
+
+    window.filterConversations=function(){
+        const s=document.getElementById('conv-search-input').value.toLowerCase();
+        renderConversations(allConversations.filter(c=>c.name.toLowerCase().includes(s)));
+    }
+
+    window.openChatWith=async function(otherUserId){
+        const chatId=getChatId(currentUser.uid,otherUserId);
+        const chatRef=doc(db,"chats",chatId);
+        const chatDoc=await getDoc(chatRef);
+        if(!chatDoc.exists())await setDoc(chatRef,{participants:[currentUser.uid,otherUserId],lastMessage:'',updatedAt:new Date()});
+        const od=await getDoc(doc(db,"users",otherUserId));
+        if(!od.exists())return;
+        const other=od.data();
+        const pic=other.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(other.name)}&background=2c5f2e&color=fff&size=40`;
+        openChat(chatId,otherUserId,other.name,pic);
+    }
+
+    window.openChat=async function(chatId,otherId,otherName,otherPic){
+        currentChatId=chatId;
+        try{
+            const uSnap=await getDocs(query(collection(db,"chats",chatId,"messages"),where("senderId","!=",currentUser.uid),where("read","==",false)));
+            for(const m of uSnap.docs)await updateDoc(doc(db,"chats",chatId,"messages",m.id),{read:true});
+        }catch(e){}
+        document.getElementById('chat-placeholder').style.display='none';
+        document.getElementById('chat-header').style.display='flex';
+        document.getElementById('messages-area').style.display='flex';
+        document.getElementById('chat-input-area').style.display='flex';
+        document.getElementById('chat-header-pic').src=otherPic;
+        document.getElementById('chat-header-name').textContent=otherName;
+        if(messagesUnsub)messagesUnsub();
+        const q=query(collection(db,"chats",chatId,"messages"),orderBy("createdAt","asc"));
+        messagesUnsub=onSnapshot(q,snap=>{
+            const area=document.getElementById('messages-area');
+            area.innerHTML='';
+            snap.forEach(d=>{
+                const m=d.data();const isSent=m.senderId===currentUser.uid;
+                const time=m.createdAt?new Date(m.createdAt.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+                area.innerHTML+=`<div class="message ${isSent?'sent':'received'}">${m.text}<div class="time">${time}</div></div>`;
+            });
+            area.scrollTop=area.scrollHeight;
+        });
+    }
+
+    window.sendMessage=async function(){
+        const input=document.getElementById('msg-input');
+        const text=input.value.trim();
+        if(!text||!currentChatId)return;
+        input.value='';
+        try{
+            await addDoc(collection(db,"chats",currentChatId,"messages"),{text,senderId:currentUser.uid,read:false,createdAt:new Date()});
+            await setDoc(doc(db,"chats",currentChatId),{lastMessage:text,updatedAt:new Date()},{merge:true});
+        }catch(err){console.error('Send error:',err);alert('Could not send message. Please try again.');}
+    }
+
+    window.logout=async function(){await signOut(auth);location.href='index.html';}
+</script>
+<script>
+    function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
+    function toggleTranslate(){document.getElementById('translate-dropdown').classList.toggle('open');}
+    function setLang(lang){localStorage.setItem('preferredLang',lang);const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};document.getElementById('current-lang').textContent=labels[lang];document.getElementById('translate-dropdown').classList.remove('open');setTimeout(()=>{const s=document.querySelector('.goog-te-combo');if(s){s.value=lang;s.dispatchEvent(new Event('change'));}},500);}
+    document.addEventListener('click',function(e){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');if(m&&!m.contains(e.target)&&!h.contains(e.target)){m.classList.remove('open');h.classList.remove('open');}const tw=document.querySelector('.translate-wrap');if(tw&&!tw.contains(e.target))document.getElementById('translate-dropdown').classList.remove('open');});
+    window.addEventListener('load',()=>{const s=localStorage.getItem('preferredLang');const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};if(s){document.getElementById('current-lang').textContent=labels[s];setTimeout(()=>{const g=document.querySelector('.goog-te-combo');if(g){g.value=s;g.dispatchEvent(new Event('change'));}},1500);}});
+</script>
+<div style="display:none;" id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

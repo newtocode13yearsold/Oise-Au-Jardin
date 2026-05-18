@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background: #f5f5f5; }
+        .navbar { background-color: #cbad00; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; flex-wrap: wrap; gap: 8px; }
+        .logo-img { height: 50px; width: auto; border-radius: 8px; }
+        .nav-links { list-style: none; display: flex; align-items: center; gap: 4px; margin: 0; padding: 0; flex-wrap: wrap; }
+        .nav-links li a { color: white; text-decoration: none; font-weight: 500; font-size: 13px; padding: 6px 10px; border-radius: 6px; transition: background 0.2s; display: inline-block; }
+        .nav-links li a:hover { background: rgba(255,255,255,0.15); }
+
+        .legal-page { max-width: 800px; margin: 60px auto; padding: 0 20px 60px 20px; }
+
+        .legal-tabs { display: flex; gap: 10px; margin-bottom: 30px; }
+        .tab-btn { padding: 10px 24px; border: 2px solid #2c5f2e; border-radius: 8px; background: white; color: #2c5f2e; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active { background: #2c5f2e; color: white; }
+        .tab-btn:hover { background: #2c5f2e; color: white; }
+
+        .legal-card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: none; }
+        .legal-card.active { display: block; }
+
+        .legal-card h1 { color: #2c5f2e; font-size: 1.8rem; margin-bottom: 8px; }
+        .legal-card .last-updated { color: #aaa; font-size: 13px; margin-bottom: 30px; }
+        .legal-card h2 { color: #2c5f2e; font-size: 1.1rem; margin-top: 28px; margin-bottom: 10px; border-left: 4px solid #2c5f2e; padding-left: 12px; }
+        .legal-card p { color: #555; font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+        .legal-card ul { color: #555; font-size: 14px; line-height: 1.7; padding-left: 20px; margin-bottom: 12px; }
+        .legal-card ul li { margin-bottom: 6px; }
+        .legal-card a { color: #2c5f2e; }
+        .highlight-box { background: #f0f7f0; border-left: 4px solid #2c5f2e; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .highlight-box p { margin: 0; color: #2c5f2e; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <img src="images/logo.png" alt="logo" class="logo-img">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="chat.html">Messages</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="legal-page">
+        <div class="legal-tabs">
+            <button class="tab-btn active" onclick="showTab('terms')">📋 Terms of Service</button>
+            <button class="tab-btn" onclick="showTab('privacy')">🔒 Privacy Policy</button>
+        </div>
+
+        <!-- TERMS OF SERVICE -->
+        <div class="legal-card active" id="tab-terms">
+            <h1>Terms of Service</h1>
+            <p class="last-updated">Last updated: May 2026</p>
+
+            <div class="highlight-box">
+                <p>By using Oise au Jardin, you agree to these terms. Please read them carefully.</p>
+            </div>
+
+            <h2>1. Who we are</h2>
+            <p>Oise au Jardin is a free platform created by Thomas Legros to connect young gardeners with clients who need gardening help in the Oise region of France. This is a non-commercial, free service.</p>
+
+            <h2>2. Who can use the platform</h2>
+            <ul>
+                <li>Anyone can browse gardeners and job posts without an account.</li>
+                <li>To post as a gardener or client, you must create a free account.</li>
+                <li>Gardeners must be young people (teenagers) looking for small gardening jobs.</li>
+                <li>You must provide accurate information when creating your account.</li>
+            </ul>
+
+            <h2>3. What you can and cannot do</h2>
+            <p>You agree not to:</p>
+            <ul>
+                <li>Post false, misleading, or inappropriate content.</li>
+                <li>Harass, threaten, or harm other users.</li>
+                <li>Use the platform for any illegal activity.</li>
+                <li>Create multiple accounts or impersonate someone else.</li>
+                <li>Use the chat feature to send spam or unsolicited messages.</li>
+            </ul>
+
+            <h2>4. Jobs and payments</h2>
+            <p>Oise au Jardin is only a platform to connect people — we are not involved in any agreement, payment, or job between gardeners and clients. Any arrangement made between users is entirely their own responsibility. We do not handle any money.</p>
+
+            <h2>5. Content you post</h2>
+            <p>You are responsible for any content you post (job descriptions, availability posts, comments, messages). We reserve the right to remove any content that violates these terms.</p>
+
+            <h2>6. Account deletion</h2>
+            <p>You can ask us to delete your account and all your data at any time by contacting us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+
+            <h2>7. Changes to these terms</h2>
+            <p>We may update these terms occasionally. Continued use of the platform means you accept the updated terms.</p>
+
+            <h2>8. Contact</h2>
+            <p>For any questions about these terms, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+        </div>
+
+        <!-- PRIVACY POLICY -->
+        <div class="legal-card" id="tab-privacy">
+            <h1>Privacy Policy</h1>
+            <p class="last-updated">Last updated: May 2026</p>
+
+            <div class="highlight-box">
+                <p>We respect your privacy. This policy explains what data we collect and how we use it, in compliance with GDPR (EU Regulation 2016/679).</p>
+            </div>
+
+            <h2>1. Who is responsible for your data</h2>
+            <p>The data controller is Thomas Legros, reachable at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+
+            <h2>2. What data we collect</h2>
+            <ul>
+                <li><strong>Account data:</strong> your name, email address, and role (gardener or client).</li>
+                <li><strong>Profile data:</strong> your location, bio, contact email, and profile picture (only if you choose to add them).</li>
+                <li><strong>Posts:</strong> job posts or gardener availability posts you create.</li>
+                <li><strong>Messages:</strong> private messages sent between users.</li>
+                <li><strong>Comments:</strong> comments you leave on posts.</li>
+                <li><strong>Ratings:</strong> star ratings you give to gardeners.</li>
+            </ul>
+
+            <h2>3. Why we collect this data</h2>
+            <ul>
+                <li>To let you create an account and log in.</li>
+                <li>To display your profile and posts to other users.</li>
+                <li>To allow private messaging between users.</li>
+                <li>We do not use your data for advertising or marketing.</li>
+            </ul>
+
+            <h2>4. Who can see your data</h2>
+            <ul>
+                <li>Your name, location, bio, and contact email are visible to other users if you fill them in.</li>
+                <li>Your messages are only visible to you and the person you are chatting with.</li>
+                <li>Your email address used to log in is never shown publicly.</li>
+            </ul>
+
+            <h2>5. Where your data is stored</h2>
+            <p>Your data is stored securely using Google Firebase (Firestore and Firebase Authentication), which is hosted on Google's servers in Europe. Google complies with GDPR.</p>
+
+            <h2>6. How long we keep your data</h2>
+            <p>We keep your data for as long as your account exists. If you ask us to delete your account, we will delete all your data within 30 days.</p>
+
+            <h2>7. Your rights under GDPR</h2>
+            <p>You have the right to:</p>
+            <ul>
+                <li><strong>Access</strong> your personal data.</li>
+                <li><strong>Correct</strong> any inaccurate data.</li>
+                <li><strong>Delete</strong> your data (right to be forgotten).</li>
+                <li><strong>Object</strong> to how we process your data.</li>
+                <li><strong>Withdraw consent</strong> at any time.</li>
+            </ul>
+            <p>To exercise any of these rights, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+
+            <h2>8. Cookies</h2>
+            <p>We use minimal cookies only for keeping you logged in and for the Google Translate feature. We do not use tracking or advertising cookies.</p>
+
+            <h2>9. Contact</h2>
+            <p>For any privacy questions, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. You also have the right to file a complaint with the French data protection authority (CNIL) at <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>.</p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.legal-card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

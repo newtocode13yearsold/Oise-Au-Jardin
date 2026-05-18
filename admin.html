@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background: #f0f2f5; }
+        .navbar { background-color: #1a3a1c; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+        .navbar .container { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; }
+        .logo-img { height: 45px; width: auto; border-radius: 8px; }
+        .admin-badge { background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+        .logout-btn { background-color: #e74c3c !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; border: none; cursor: pointer; }
+        .back-btn { background-color: rgba(255,255,255,0.15) !important; color: white !important; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; border: 1px solid rgba(255,255,255,0.3); cursor: pointer; margin-right: 8px; }
+
+        .admin-page { max-width: 1200px; margin: 30px auto; padding: 0 20px 60px; }
+
+        .admin-header { background: linear-gradient(135deg, #1a3a1c, #2c5f2e); border-radius: 16px; padding: 30px; color: white; margin-bottom: 30px; display: flex; align-items: center; gap: 20px; }
+        .admin-header h1 { margin: 0; font-size: 1.8rem; }
+        .admin-header p { margin: 8px 0 0; opacity: 0.8; font-size: 14px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); text-align: center; }
+        .stat-card .stat-number { font-size: 2rem; font-weight: 800; color: #2c5f2e; }
+        .stat-card .stat-label { font-size: 13px; color: #888; margin-top: 4px; }
+
+        .admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; border: 2px solid #2c5f2e; border-radius: 8px; background: white; color: #2c5f2e; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .tab-btn.active, .tab-btn:hover { background: #2c5f2e; color: white; }
+
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        .admin-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 16px; }
+        .admin-card-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .admin-pic { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 3px solid #2c5f2e; flex-shrink: 0; }
+        .admin-card h3 { color: #2c5f2e; margin: 0 0 4px; font-size: 16px; }
+        .admin-card .meta { font-size: 13px; color: #888; }
+        .admin-card .detail { font-size: 14px; color: #555; margin-top: 8px; line-height: 1.6; }
+        .admin-actions { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
+        .btn-message { padding: 7px 16px; background: #2c5f2e; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-message:hover { background: #1e4220; }
+        .btn-delete { padding: 7px 16px; background: #fee; color: #e74c3c; border: 1px solid #e74c3c; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-delete:hover { background: #e74c3c; color: white; }
+        .btn-ban { padding: 7px 16px; background: #fff3cd; color: #856404; border: 1px solid #ffc107; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-ban:hover { background: #ffc107; color: white; }
+        .btn-view { padding: 7px 16px; background: #e8f4fd; color: #2980b9; border: 1px solid #2980b9; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .btn-view:hover { background: #2980b9; color: white; }
+
+        .role-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .role-gardener { background: #e8f5e9; color: #2c5f2e; }
+        .role-client { background: #e3f2fd; color: #1565c0; }
+        .role-admin { background: #fff3e0; color: #e65100; }
+
+        .search-bar { background: white; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 10px; }
+        .search-bar input, .search-bar select { flex: 1; padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .search-bar input:focus, .search-bar select:focus { outline: none; border-color: #2c5f2e; }
+        .search-bar button { padding: 9px 20px; background: #2c5f2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+
+        .chat-preview { background: #f9f9f9; border-radius: 10px; padding: 14px; margin-top: 12px; max-height: 200px; overflow-y: auto; }
+        .chat-msg { padding: 6px 10px; margin-bottom: 6px; border-radius: 8px; font-size: 13px; }
+        .chat-msg.sent-by { background: #e8f5e9; }
+        .chat-msg .msg-sender { font-weight: 600; color: #2c5f2e; font-size: 11px; margin-bottom: 2px; }
+        .chat-msg .msg-text { color: #444; }
+        .chat-msg .msg-time { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 16px; padding: 36px; width: 100%; max-width: 460px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .modal-box h2 { color: #2c5f2e; margin-bottom: 20px; }
+        .modal-box textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; resize: vertical; min-height: 100px; }
+        .modal-box textarea:focus { outline: none; border-color: #2c5f2e; }
+        .modal-box .btn-send { width: 100%; padding: 12px; background: #2c5f2e; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 12px; }
+        .close-btn { position: absolute; top: 12px; right: 16px; font-size: 22px; cursor: pointer; color: #aaa; background: none; border: none; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #aaa; }
+        .empty-state span { font-size: 48px; display: block; margin-bottom: 12px; }
+        .loading { text-align: center; padding: 40px; color: #aaa; }
+
+        .access-denied { text-align: center; margin-top: 100px; }
+        .access-denied h2 { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" style="background:#1a3a1c;">
+    <div class="container">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <img src="images/logo.png" alt="logo" class="logo-img" onclick="location.href='index.html'">
+            <span style="background:#f39c12;color:white;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">⚙️ ADMIN PANEL</span>
+        </div>
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">← Back to Site</a></li>
+            </ul>
+            <span style="color:rgba(255,255,255,0.7);font-size:13px;" id="admin-welcome"></span>
+            <button class="logout-btn" onclick="logout()">Log Out</button>
+        </div>
+    </div>
+</nav>
+
+    <div class="access-denied" id="access-denied" style="display:none;">
+        <h2>🚫 Access Denied</h2>
+        <p>You don't have admin permissions.</p>
+        <a href="index.html">← Go back</a>
+    </div>
+
+    <div class="admin-page" id="admin-page" style="display:none;">
+
+        <div class="admin-header">
+            <span style="font-size:48px;">⚙️</span>
+            <div>
+                <h1>Admin Panel</h1>
+                <p>Full control over Oise au Jardin — users, posts, conversations and more.</p>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-number" id="stat-users">—</div><div class="stat-label">Total Users</div></div>
+            <div class="stat-card"><div class="stat-number" id="stat-gardeners-count">—</div><div class="stat-label">Gardener Accounts</div></div>
+            <div class="stat-card"><div class="stat-number" id="stat-clients">—</div><div class="stat-label">Client Accounts</div></div>
+            <div class="stat-card"><div class="stat-number" id="stat-posts">—</div><div class="stat-label">Gardener Posts</div></div>
+            <div class="stat-card"><div class="stat-number" id="stat-jobs">—</div><div class="stat-label">Job Posts</div></div>
+            <div class="stat-card"><div class="stat-number" id="stat-chats">—</div><div class="stat-label">Conversations</div></div>
+        </div>
+
+        <!-- TABS -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="showTab('users')">👥 Users</button>
+            <button class="tab-btn" onclick="showTab('gardener-posts')">🌿 Gardener Posts</button>
+            <button class="tab-btn" onclick="showTab('job-posts')">🏡 Job Posts</button>
+            <button class="tab-btn" onclick="showTab('conversations')">💬 Conversations</button>
+        </div>
+
+        <!-- USERS TAB -->
+        <div class="admin-section active" id="tab-users">
+            <div class="search-bar">
+                <input type="text" id="user-search" placeholder="Search by name or email..." oninput="filterUsers()">
+                <select id="user-filter-role" onchange="filterUsers()">
+                    <option value="">All roles</option>
+                    <option value="gardener">Gardeners</option>
+                    <option value="client">Clients</option>
+                </select>
+            </div>
+            <div id="users-list"><div class="loading">Loading users...</div></div>
+        </div>
+
+        <!-- GARDENER POSTS TAB -->
+        <div class="admin-section" id="tab-gardener-posts">
+            <div class="search-bar">
+                <input type="text" id="gpost-search" placeholder="Search by name or location..." oninput="filterGardenerPosts()">
+            </div>
+            <div id="gardener-posts-list"><div class="loading">Loading posts...</div></div>
+        </div>
+
+        <!-- JOB POSTS TAB -->
+        <div class="admin-section" id="tab-job-posts">
+            <div class="search-bar">
+                <input type="text" id="jpost-search" placeholder="Search by location or job type..." oninput="filterJobPosts()">
+            </div>
+            <div id="job-posts-list"><div class="loading">Loading jobs...</div></div>
+        </div>
+
+        <!-- CONVERSATIONS TAB -->
+        <div class="admin-section" id="tab-conversations">
+            <div id="conversations-list"><div class="loading">Loading conversations...</div></div>
+        </div>
+
+    </div>
+
+    <!-- MESSAGE MODAL -->
+    <div class="modal-overlay" id="msgModal">
+        <div class="modal-box">
+            <button class="close-btn" onclick="closeMsgModal()">✕</button>
+            <h2>📨 Send Message</h2>
+            <p style="font-size:14px;color:#666;margin-bottom:12px;">To: <strong id="msg-to-name"></strong></p>
+            <textarea id="admin-msg-text" placeholder="Type your message..."></textarea>
+            <button class="btn-send" onclick="sendAdminMessage()">Send Message</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, addDoc, orderBy, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",
+            authDomain: "oise-au-jardin.firebaseapp.com",
+            projectId: "oise-au-jardin",
+            storageBucket: "oise-au-jardin.firebasestorage.app",
+            messagingSenderId: "895167286481",
+            appId: "1:895167286481:web:6c4853a9c793c3aed149f0"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentAdmin = null;
+        let allUsers = [];
+        let allGardenerPosts = [];
+        let allJobPosts = [];
+        let msgTargetId = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { location.href = 'index.html'; return; }
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (!userDoc.exists() || !userDoc.data().admin) {
+                document.getElementById('access-denied').style.display = 'block';
+                return;
+            }
+            currentAdmin = user;
+            document.getElementById('admin-page').style.display = 'block';
+            document.getElementById('admin-welcome').textContent = 'Hello, ' + userDoc.data().name;
+            loadAll();
+        });
+
+        async function loadAll() {
+            await Promise.all([loadStats(), loadUsers(), loadGardenerPosts(), loadJobPosts(), loadConversations()]);
+        }
+
+        async function loadStats() {
+            const usersSnap = await getDocs(collection(db, "users"));
+            const gSnap = await getDocs(collection(db, "gardeners"));
+            const jSnap = await getDocs(collection(db, "jobs"));
+            const cSnap = await getDocs(collection(db, "chats"));
+            let gardeners = 0, clients = 0;
+            usersSnap.forEach(d => { if (d.data().role === 'gardener') gardeners++; else clients++; });
+            document.getElementById('stat-users').textContent = usersSnap.size;
+            document.getElementById('stat-gardeners-count').textContent = gardeners;
+            document.getElementById('stat-clients').textContent = clients;
+            document.getElementById('stat-posts').textContent = gSnap.size;
+            document.getElementById('stat-jobs').textContent = jSnap.size;
+            document.getElementById('stat-chats').textContent = cSnap.size;
+        }
+
+        async function loadUsers() {
+            const snap = await getDocs(collection(db, "users"));
+            allUsers = [];
+            snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
+            renderUsers(allUsers);
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById('users-list');
+            if (users.length === 0) { list.innerHTML = '<div class="empty-state"><span>👥</span>No users found.</div>'; return; }
+            list.innerHTML = '';
+            users.forEach(u => {
+                const pic = u.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || 'User')}&background=2c5f2e&color=fff&size=50`;
+                const roleBadge = u.admin ? 'role-admin' : (u.role === 'gardener' ? 'role-gardener' : 'role-client');
+                const roleLabel = u.admin ? '⭐ Admin' : (u.role === 'gardener' ? '🌱 Gardener' : '🏡 Client');
+                list.innerHTML += `
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <img class="admin-pic" src="${pic}" alt="${u.name}">
+                            <div style="flex:1;">
+                                <h3>${u.name || 'Unknown'} <span class="role-badge ${roleBadge}">${roleLabel}</span></h3>
+                                <div class="meta">✉️ ${u.email || '—'} · 📍 ${u.location || 'No location'}</div>
+                            </div>
+                        </div>
+                        ${u.bio ? `<div class="detail">📝 ${u.bio}</div>` : ''}
+                        <div class="admin-actions">
+                            <button class="btn-message" onclick="openMsgModal('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">💬 Send Message</button>
+                            <button class="btn-view" onclick="location.href='chat.html?with=${u.id}'">👁 View Chat</button>
+                            ${!u.admin ? `<button class="btn-delete" onclick="deleteUser('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')">🗑 Delete Account</button>` : ''}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        window.filterUsers = function() {
+            const search = document.getElementById('user-search').value.toLowerCase();
+            const role = document.getElementById('user-filter-role').value;
+            const filtered = allUsers.filter(u => {
+                const matchSearch = !search || (u.name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search);
+                const matchRole = !role || u.role === role;
+                return matchSearch && matchRole;
+            });
+            renderUsers(filtered);
+        }
+
+        async function loadGardenerPosts() {
+            const snap = await getDocs(query(collection(db, "gardeners"), orderBy("createdAt", "desc")));
+            allGardenerPosts = [];
+            snap.forEach(d => allGardenerPosts.push({ id: d.id, ...d.data() }));
+            renderGardenerPosts(allGardenerPosts);
+        }
+
+        function renderGardenerPosts(posts) {
+            const list = document.getElementById('gardener-posts-list');
+            if (posts.length === 0) { list.innerHTML = '<div class="empty-state"><span>🌿</span>No gardener posts found.</div>'; return; }
+            list.innerHTML = '';
+            posts.forEach(p => {
+                const pic = p.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name || 'User')}&background=2c5f2e&color=fff&size=50`;
+                list.innerHTML += `
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <img class="admin-pic" src="${pic}" alt="${p.name}">
+                            <div>
+                                <h3>🌿 ${p.name}</h3>
+                                <div class="meta">📍 ${p.location} · €${p.price}/hr</div>
+                            </div>
+                        </div>
+                        <div class="detail">🛠 ${p.services}<br>${p.description}</div>
+                        <div class="admin-actions">
+                            <button class="btn-message" onclick="openMsgModal('${p.userId}', '${(p.name || '').replace(/'/g, "\\'")}')">💬 Message Gardener</button>
+                            <button class="btn-delete" onclick="deleteGardenerPost('${p.id}')">🗑 Delete Post</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        window.filterGardenerPosts = function() {
+            const search = document.getElementById('gpost-search').value.toLowerCase();
+            const filtered = allGardenerPosts.filter(p => (p.name || '').toLowerCase().includes(search) || (p.location || '').toLowerCase().includes(search) || (p.services || '').toLowerCase().includes(search));
+            renderGardenerPosts(filtered);
+        }
+
+        async function loadJobPosts() {
+            const snap = await getDocs(query(collection(db, "jobs"), orderBy("createdAt", "desc")));
+            allJobPosts = [];
+            for (const d of snap.docs) {
+                const jobData = d.data();
+                let posterName = 'Unknown';
+                if (jobData.postedBy) {
+                    try { const u = await getDoc(doc(db, "users", jobData.postedBy)); if (u.exists()) posterName = u.data().name; } catch(e) {}
+                }
+                allJobPosts.push({ id: d.id, ...jobData, posterName });
+            }
+            renderJobPosts(allJobPosts);
+        }
+
+        function renderJobPosts(posts) {
+            const list = document.getElementById('job-posts-list');
+            if (posts.length === 0) { list.innerHTML = '<div class="empty-state"><span>🏡</span>No job posts found.</div>'; return; }
+            list.innerHTML = '';
+            posts.forEach(p => {
+                list.innerHTML += `
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div style="width:50px;height:50px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🏡</div>
+                            <div>
+                                <h3>${p.jobType}</h3>
+                                <div class="meta">📍 ${p.location} · 💰 €${p.budget} · 📅 ${p.date} · Posted by: ${p.posterName}</div>
+                            </div>
+                        </div>
+                        <div class="detail">${p.description}</div>
+                        <div class="admin-actions">
+                            <button class="btn-message" onclick="openMsgModal('${p.postedBy}', '${(p.posterName || '').replace(/'/g, "\\'")}')">💬 Message Client</button>
+                            <button class="btn-delete" onclick="deleteJobPost('${p.id}')">🗑 Delete Post</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        window.filterJobPosts = function() {
+            const search = document.getElementById('jpost-search').value.toLowerCase();
+            const filtered = allJobPosts.filter(p => (p.location || '').toLowerCase().includes(search) || (p.jobType || '').toLowerCase().includes(search) || (p.posterName || '').toLowerCase().includes(search));
+            renderJobPosts(filtered);
+        }
+
+        async function loadConversations() {
+            const snap = await getDocs(collection(db, "chats"));
+            const list = document.getElementById('conversations-list');
+            if (snap.empty) { list.innerHTML = '<div class="empty-state"><span>💬</span>No conversations yet.</div>'; return; }
+            list.innerHTML = '';
+            for (const chatDoc of snap.docs) {
+                const chatData = chatDoc.data();
+                const participants = chatData.participants || [];
+                let names = [];
+                for (const uid of participants) {
+                    try { const u = await getDoc(doc(db, "users", uid)); if (u.exists()) names.push(u.data().name); } catch(e) {}
+                }
+                const msgsSnap = await getDocs(query(collection(db, "chats", chatDoc.id, "messages"), orderBy("createdAt", "asc")));
+                let msgsHTML = '';
+                msgsSnap.forEach(m => {
+                    const data = m.data();
+                    const time = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleString() : '';
+                    msgsHTML += `<div class="chat-msg"><div class="msg-sender">${data.senderName || 'User'}</div><div class="msg-text">${data.text}</div><div class="msg-time">${time}</div></div>`;
+                });
+                list.innerHTML += `
+                    <div class="admin-card">
+                        <div class="admin-card-header">
+                            <div style="width:50px;height:50px;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💬</div>
+                            <div>
+                                <h3>${names.join(' ↔ ') || 'Unknown conversation'}</h3>
+                                <div class="meta">${msgsSnap.size} message${msgsSnap.size !== 1 ? 's' : ''} · Last: ${chatData.lastMessage || '—'}</div>
+                            </div>
+                        </div>
+                        ${msgsHTML ? `<div class="chat-preview">${msgsHTML}</div>` : '<div class="detail" style="color:#ccc;">No messages yet.</div>'}
+                    </div>`;
+            }
+        }
+
+        window.deleteUser = async function(userId, name) {
+            if (!confirm(`Delete account of ${name}? This cannot be undone.`)) return;
+            await deleteDoc(doc(db, "users", userId));
+            loadUsers();
+            loadStats();
+        }
+
+        window.deleteGardenerPost = async function(postId) {
+            if (!confirm('Delete this gardener post?')) return;
+            await deleteDoc(doc(db, "gardeners", postId));
+            loadGardenerPosts();
+            loadStats();
+        }
+
+        window.deleteJobPost = async function(postId) {
+            if (!confirm('Delete this job post?')) return;
+            await deleteDoc(doc(db, "jobs", postId));
+            loadJobPosts();
+            loadStats();
+        }
+
+        window.openMsgModal = function(userId, name) {
+            msgTargetId = userId;
+            document.getElementById('msg-to-name').textContent = name;
+            document.getElementById('admin-msg-text').value = '';
+            document.getElementById('msgModal').classList.add('active');
+        }
+
+        window.closeMsgModal = function() {
+            document.getElementById('msgModal').classList.remove('active');
+        }
+
+        window.sendAdminMessage = async function() {
+            const text = document.getElementById('admin-msg-text').value.trim();
+            if (!text || !msgTargetId) return;
+            const chatId = [currentAdmin.uid, msgTargetId].sort().join('_');
+            const chatRef = doc(db, "chats", chatId);
+            const chatDoc = await getDoc(chatRef);
+            if (!chatDoc.exists()) {
+                await setDoc(chatRef, { participants: [currentAdmin.uid, msgTargetId], lastMessage: '', updatedAt: new Date() });
+            }
+            await addDoc(collection(db, "chats", chatId, "messages"), { text, senderId: currentAdmin.uid, read: false, createdAt: new Date() });
+            await setDoc(chatRef, { lastMessage: text, updatedAt: new Date() }, { merge: true });
+            closeMsgModal();
+            alert('Message sent successfully!');
+        }
+
+        window.logout = async function() { await signOut(auth); location.href = 'index.html'; }
+    </script>
+
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+    <script>
+    function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
+    document.addEventListener('click',function(e){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');if(m&&!m.contains(e.target)&&!h.contains(e.target)){m.classList.remove('open');h.classList.remove('open');}});
+</script>
+</body>
+</html>

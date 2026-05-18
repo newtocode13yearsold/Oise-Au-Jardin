@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <img src="images/logo.png" alt="Oise au Jardin" class="logo-img" onclick="location.href='index.html'">
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li class="nav-divider"></li>
+            </ul>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span class="welcome-msg" id="welcome-msg"></span>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </li>
+            <div class="translate-wrap">
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <div class="translate-dropdown" id="translate-dropdown">
+                    <a onclick="setLang('en')">🇬🇧 English</a>
+                    <a onclick="setLang('fr')">🇫🇷 Français</a>
+                    <a onclick="setLang('es')">🇪🇸 Español</a>
+                    <a onclick="setLang('de')">🇩🇪 Deutsch</a>
+                    <a onclick="setLang('it')">🇮🇹 Italiano</a>
+                    <a onclick="setLang('nl')">🇳🇱 Nederlands</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="profile-page">
+    <div class="not-logged-in" id="not-logged-in" style="display:none;">
+        <p>You need to be logged in to view your profile.</p>
+        <a href="index.html">← Go back and log in</a>
+    </div>
+
+    <div id="profile-card" class="profile-card" style="display:none;">
+        <div class="profile-pic-wrapper">
+            <img id="profile-pic" class="profile-pic" src="" alt="Profile picture">
+            <button class="pic-edit-btn" onclick="document.getElementById('pic-input').click()">✏️</button>
+            <input type="file" id="pic-input" accept="image/*" onchange="handlePicChange(event)" style="display:none;">
+        </div>
+        <p class="profile-name" id="display-name"></p>
+        <p class="profile-role" id="display-role"></p>
+        <form onsubmit="saveProfile(event)">
+            <input type="text" id="field-location" placeholder="Your location (e.g. Compiègne)">
+            <input type="email" id="field-contact" placeholder="Contact email (shown on your profile)">
+            <textarea id="field-bio" placeholder="Write a short bio about yourself..."></textarea>
+            <button type="submit" class="save-btn">💾 Save Profile</button>
+        </form>
+        <p class="success-msg" id="success-msg">✅ Profile saved!</p>
+    </div>
+
+    <div class="my-posts-section" id="my-posts-section" style="display:none;">
+        <h2>📋 My Posts</h2>
+        <div id="my-posts-list"></div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
+        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);const storage=getStorage(app);
+    let currentUser=null,pendingPhotoFile=null;
+
+    async function updateBadge(uid){
+        const q=query(collection(db,"chats"),where("participants","array-contains",uid));
+        onSnapshot(q,async snap=>{
+            let n=0;for(const d of snap.docs){const m=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",uid),where("read","==",false)));n+=m.size;}
+            const b=document.getElementById('msg-badge');if(b){b.style.display=n>0?'inline-block':'none';b.textContent=n>99?'99+':n;}
+        });
+    }
+
+    onAuthStateChanged(auth,async user=>{
+        if(user){
+            currentUser=user;
+            document.getElementById('btn-login').style.display='none';
+            document.getElementById('btn-signup').style.display='none';
+            document.getElementById('btn-logout').style.display='flex';
+            document.getElementById('profile-card').style.display='block';
+            document.getElementById('my-posts-section').style.display='block';
+            document.getElementById('not-logged-in').style.display='none';
+            const d=await getDoc(doc(db,"users",user.uid));
+            if(d.exists()){
+                const data=d.data();
+                document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';
+                document.getElementById('display-name').textContent=data.name;
+                document.getElementById('display-role').textContent=data.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+                document.getElementById('field-location').value=data.location||'';
+                document.getElementById('field-contact').value=data.contactEmail||data.email||'';
+                document.getElementById('field-bio').value=data.bio||'';
+                document.getElementById('profile-pic').src=data.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2c5f2e&color=fff&size=110`;
+                if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';
+            }
+            updateBadge(user.uid);
+            loadMyPosts(user.uid);
+        }else{
+            document.getElementById('profile-card').style.display='none';
+            document.getElementById('my-posts-section').style.display='none';
+            document.getElementById('not-logged-in').style.display='block';
+        }
+    });
+
+    async function loadMyPosts(uid){
+        const list=document.getElementById('my-posts-list');list.innerHTML='';
+        const gSnap=await getDocs(query(collection(db,"gardeners"),where("userId","==",uid)));
+        const jSnap=await getDocs(query(collection(db,"jobs"),where("postedBy","==",uid)));
+        if(gSnap.empty&&jSnap.empty){list.innerHTML='<p class="empty-posts">You have no posts yet.</p>';return;}
+        gSnap.forEach(d=>{const x=d.data();list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('gardeners','${d.id}')">🗑 Delete</button><h3>🌿 Gardener Availability</h3><p>📍 ${x.location}</p><p>🛠 ${x.services}</p><p>€${x.price}/hr</p></div>`;});
+        jSnap.forEach(d=>{const x=d.data();const tasks=Array.isArray(x.tasks)?x.tasks.join(', '):(x.jobType||'');list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('jobs','${d.id}')">🗑 Delete</button><h3>🏡 Job Post</h3><p>📍 ${x.location}</p><p>🔧 ${tasks}</p><p>💰 Budget: €${x.budget}</p></div>`;});
+    }
+
+    window.deletePost=async function(col,id){if(!confirm('Delete this post?'))return;await deleteDoc(doc(db,col,id));loadMyPosts(currentUser.uid);}
+    window.handlePicChange=function(e){const file=e.target.files[0];if(!file)return;pendingPhotoFile=file;const r=new FileReader();r.onload=ev=>document.getElementById('profile-pic').src=ev.target.result;r.readAsDataURL(file);}
+    window.saveProfile=async function(e){
+        e.preventDefault();if(!currentUser)return;
+        let photoURL=null;
+        if(pendingPhotoFile){try{const sr=ref(storage,`profile-pictures/${currentUser.uid}`);await uploadBytes(sr,pendingPhotoFile);photoURL=await getDownloadURL(sr);}catch(err){console.log('Photo upload failed:',err);}}
+        const updates={location:document.getElementById('field-location').value,contactEmail:document.getElementById('field-contact').value,bio:document.getElementById('field-bio').value};
+        if(photoURL)updates.photoURL=photoURL;
+        await updateDoc(doc(db,"users",currentUser.uid),updates);
+        const s=document.getElementById('success-msg');s.style.display='block';setTimeout(()=>s.style.display='none',3000);pendingPhotoFile=null;
+    }
+    window.logout=async function(){await signOut(auth);location.href='index.html';}
+</script>
+<script>
+    function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
+    function toggleTranslate(){document.getElementById('translate-dropdown').classList.toggle('open');}
+    function setLang(lang){localStorage.setItem('preferredLang',lang);const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};document.getElementById('current-lang').textContent=labels[lang];document.getElementById('translate-dropdown').classList.remove('open');setTimeout(()=>{const s=document.querySelector('.goog-te-combo');if(s){s.value=lang;s.dispatchEvent(new Event('change'));}},500);}
+    document.addEventListener('click',function(e){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');if(m&&!m.contains(e.target)&&!h.contains(e.target)){m.classList.remove('open');h.classList.remove('open');}const tw=document.querySelector('.translate-wrap');if(tw&&!tw.contains(e.target))document.getElementById('translate-dropdown').classList.remove('open');});
+    window.addEventListener('load',()=>{const s=localStorage.getItem('preferredLang');const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};if(s){document.getElementById('current-lang').textContent=labels[s];setTimeout(()=>{const g=document.querySelector('.goog-te-combo');if(g){g.value=s;g.dispatchEvent(new Event('change'));}},1500);}});
+</script>
+<div style="display:none;" id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
