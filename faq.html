@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Oise au Jardin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .faq-hero {
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("./images/lawn.jpg");
+            background-size: cover;
+            background-position: center;
+            padding: 60px 20px;
+            text-align: center;
+            color: white;
+        }
+        .faq-hero h1 { font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; margin-bottom: 8px; }
+        .faq-hero p { font-size: 16px; opacity: 0.88; }
+
+        .faq-page { max-width: 800px; margin: 50px auto; padding: 0 20px 80px; }
+
+        .faq-section { margin-bottom: 44px; }
+        .faq-section h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #1a3a1c;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8f5e9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .faq-item:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 18px 20px;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a3a1c;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            font-family: inherit;
+        }
+        .faq-question:hover { color: #2c5f2e; }
+        .faq-question .arrow {
+            font-size: 12px;
+            color: #2c5f2e;
+            transition: transform 0.25s;
+            flex-shrink: 0;
+        }
+        .faq-item.open .faq-question .arrow { transform: rotate(180deg); }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 20px;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 400px;
+            padding: 0 20px 18px;
+        }
+        .faq-answer p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.75;
+            margin: 0;
+        }
+        .faq-answer a { color: #2c5f2e; font-weight: 600; }
+
+        .faq-cta {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            margin-top: 48px;
+        }
+        .faq-cta h2 { color: #1a3a1c; font-size: 1.3rem; margin-bottom: 10px; }
+        .faq-cta p { color: #555; font-size: 15px; margin-bottom: 22px; }
+        .faq-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary { padding: 12px 26px; background: #2c5f2e; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s, transform 0.2s; }
+        .btn-primary:hover { background: #1e4220; transform: translateY(-1px); color: white; }
+        .btn-outline { padding: 12px 26px; background: white; color: #2c5f2e; border: 2px solid #2c5f2e; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s; }
+        .btn-outline:hover { background: #2c5f2e; color: white; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <img src="images/logo.png" alt="Oise au Jardin" class="logo-img" onclick="location.href='index.html'">
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <div class="nav-menu" id="nav-menu">
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="gardeners.html">Gardeners</a></li>
+                <li><a href="jobs.html">Jobs</a></li>
+                <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li><a href="faq.html" class="active">FAQ</a></li>
+                <li class="nav-divider"></li>
+            </ul>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
+            <li id="btn-logout" style="display:none; list-style:none; align-items:center; gap:6px; flex-wrap:wrap;">
+                <span class="welcome-msg" id="welcome-msg"></span>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button class="logout-btn" onclick="logout()">Log Out</button>
+            </li>
+            <div class="translate-wrap">
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <div class="translate-dropdown" id="translate-dropdown">
+                    <a onclick="setLang('en')">🇬🇧 English</a>
+                    <a onclick="setLang('fr')">🇫🇷 Français</a>
+                    <a onclick="setLang('es')">🇪🇸 Español</a>
+                    <a onclick="setLang('de')">🇩🇪 Deutsch</a>
+                    <a onclick="setLang('it')">🇮🇹 Italiano</a>
+                    <a onclick="setLang('nl')">🇳🇱 Nederlands</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="faq-hero">
+    <h1>❓ Frequently Asked Questions</h1>
+    <p>Everything you need to know about Oise au Jardin</p>
+</div>
+
+<div class="faq-page">
+
+    <!-- GENERAL -->
+    <div class="faq-section">
+        <h2>🌿 General</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                What is Oise au Jardin?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Oise au Jardin is a free platform that connects young gardeners (teenagers looking for small jobs) with clients who need help in their garden. It was created by Thomas Legros, a 14-year-old from the Oise region of France. It's completely free for everyone — no fees, no subscriptions, ever.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                Is it really free?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Yes, 100% free. Creating an account, posting jobs, posting your availability as a gardener, messaging other users — all of it is completely free. We don't take any commission or charge any fees.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                What area does the platform cover?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>The platform is mainly focused on the Oise region in France (cities like Compiègne, Senlis, Creil, Beauvais, etc.), but anyone from anywhere can sign up and use it.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOR CLIENTS -->
+    <div class="faq-section">
+        <h2>🏡 For Clients</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I find a gardener?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Go to the <a href="gardeners.html">Gardeners page</a> and browse available young gardeners near you. You can filter by location, service type, price, and rating. Click "View Profile" on any card to see more details, then send them a message directly.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I post a job?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Create a free account (choose "Client" when signing up), then go to the <a href="jobs.html">Jobs page</a> and click "Post a Job". Fill in the location, what tasks you need done, your budget, and the date — and interested gardeners will be able to contact you.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I pay the gardener?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Oise au Jardin is only a platform to connect people — we don't handle any payments. You arrange payment directly with the gardener (cash, bank transfer, etc.) after agreeing on the job details in the chat.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOR GARDENERS -->
+    <div class="faq-section">
+        <h2>🌱 For Gardeners</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I sign up as a gardener?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Click "Sign Up" at the top of the page and choose "Young Gardener" as your role. Then go to the <a href="gardeners.html">Gardeners page</a> and click "Post Your Availability" to create your gardener profile with your location, services, and hourly price.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                What services can I offer?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Any gardening work you're comfortable with — lawn mowing, weeding, hedge trimming, pruning, planting, leaf collection, watering, or general tidying. You can list whatever you offer when you create your availability post.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How much should I charge?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>That's entirely up to you. A typical rate for a young gardener in France is around €8–€15 per hour, depending on the task and your experience. You set your own price when you post your profile.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAFETY -->
+    <div class="faq-section">
+        <h2>🔒 Safety</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                Is it safe to meet someone from the platform?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>We recommend always telling a parent or guardian before meeting someone for a gardening job. For your first job with a new client, it's a good idea to bring a friend or have a parent nearby. Always trust your instincts — if something feels off, it's okay to say no.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                What if someone is rude or inappropriate?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Please report it immediately by emailing us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. We take safety seriously and will review and remove any users who break our rules. You can also just block and ignore any user who makes you uncomfortable.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                Is my personal data safe?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Yes. Your data is stored securely on Google Firebase, which follows strict EU data protection rules (GDPR). Your login email is never shown publicly. Read our full <a href="legal.html">Privacy Policy</a> for all the details.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACCOUNT -->
+    <div class="faq-section">
+        <h2>👤 My Account</h2>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I edit my profile?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Log in and click "My Profile" in the navigation bar. From there you can update your location, bio, contact email, and profile picture.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                How do I delete my account?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Email us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> and we'll delete your account and all your data within 30 days. This is your right under GDPR.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question" onclick="toggle(this)">
+                I forgot my password. What do I do?
+                <span class="arrow">▼</span>
+            </button>
+            <div class="faq-answer">
+                <p>Contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> and we'll help you reset it. We're working on adding a self-service password reset feature soon.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="faq-cta">
+        <h2>Still have a question?</h2>
+        <p>We're happy to help — just send us a message.</p>
+        <div class="faq-cta-btns">
+            <a href="index.html#contact" class="btn-primary">✉️ Contact Us</a>
+            <a href="gardeners.html" class="btn-outline">🌱 Find a Gardener</a>
+        </div>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform for young people</p>
+        <p>Contact: <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a></p>
+        <p style="margin-top:12px;"><a href="legal.html">Terms of Service</a> &nbsp;·&nbsp; <a href="legal.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a></p>
+        <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
+    </div>
+</footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = { apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI", authDomain:"oise-au-jardin.firebaseapp.com", projectId:"oise-au-jardin", storageBucket:"oise-au-jardin.firebasestorage.app", messagingSenderId:"895167286481", appId:"1:895167286481:web:6c4853a9c793c3aed149f0" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    async function updateBadge(uid) {
+        const q = query(collection(db,"chats"), where("participants","array-contains",uid));
+        onSnapshot(q, async snap => {
+            let n = 0;
+            for (const d of snap.docs) { const m = await getDocs(query(collection(db,"chats",d.id,"messages"), where("senderId","!=",uid), where("read","==",false))); n += m.size; }
+            const b = document.getElementById('msg-badge');
+            if (b) { b.style.display = n > 0 ? 'inline-block' : 'none'; b.textContent = n > 99 ? '99+' : n; }
+        });
+    }
+
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            const d = await getDoc(doc(db,"users",user.uid));
+            const data = d.exists() ? d.data() : {};
+            document.getElementById('btn-login').style.display = 'none';
+            document.getElementById('btn-signup').style.display = 'none';
+            document.getElementById('btn-logout').style.display = 'flex';
+            document.getElementById('welcome-msg').textContent = 'Hi, ' + (data.name || '') + '!';
+            updateBadge(user.uid);
+        } else {
+            document.getElementById('btn-login').style.display = 'inline';
+            document.getElementById('btn-signup').style.display = 'inline';
+            document.getElementById('btn-logout').style.display = 'none';
+        }
+    });
+
+    window.logout = async function() { await signOut(auth); location.href = 'index.html'; }
+</script>
+<script>
+    function toggle(btn) {
+        const item = btn.closest('.faq-item');
+        const wasOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+        if (!wasOpen) item.classList.add('open');
+    }
+    function toggleMenu() { const m = document.getElementById('nav-menu'); const h = document.getElementById('hamburger'); m.classList.toggle('open'); h.classList.toggle('open'); }
+    function toggleTranslate() { document.getElementById('translate-dropdown').classList.toggle('open'); }
+    function setLang(lang) { localStorage.setItem('preferredLang', lang); const labels = {en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'}; document.getElementById('current-lang').textContent = labels[lang]; document.getElementById('translate-dropdown').classList.remove('open'); setTimeout(() => { const s = document.querySelector('.goog-te-combo'); if (s) { s.value = lang; s.dispatchEvent(new Event('change')); } }, 500); }
+    document.addEventListener('click', function(e) {
+        const m = document.getElementById('nav-menu'); const h = document.getElementById('hamburger');
+        if (m && !m.contains(e.target) && !h.contains(e.target)) { m.classList.remove('open'); h.classList.remove('open'); }
+        const tw = document.querySelector('.translate-wrap');
+        if (tw && !tw.contains(e.target)) document.getElementById('translate-dropdown').classList.remove('open');
+    });
+    window.addEventListener('load', () => {
+        const s = localStorage.getItem('preferredLang');
+        const labels = {en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};
+        if (s) { document.getElementById('current-lang').textContent = labels[s]; setTimeout(() => { const g = document.querySelector('.goog-te-combo'); if (g) { g.value = s; g.dispatchEvent(new Event('change')); } }, 1500); }
+    });
+</script>
+<div style="display:none;" id="google_translate_element"></div>
+<script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

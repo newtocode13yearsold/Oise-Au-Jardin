@@ -129,10 +129,10 @@
 
         <!-- TABS -->
         <div class="admin-tabs">
-            <button class="tab-btn active" onclick="showTab('users')">👥 Users</button>
-            <button class="tab-btn" onclick="showTab('gardener-posts')">🌿 Gardener Posts</button>
-            <button class="tab-btn" onclick="showTab('job-posts')">🏡 Job Posts</button>
-            <button class="tab-btn" onclick="showTab('conversations')">💬 Conversations</button>
+            <button class="tab-btn active" onclick="showTab(event,'users')">👥 Users</button>
+            <button class="tab-btn" onclick="showTab(event,'gardener-posts')">🌿 Gardener Posts</button>
+            <button class="tab-btn" onclick="showTab(event,'job-posts')">🏡 Job Posts</button>
+            <button class="tab-btn" onclick="showTab(event,'conversations')">💬 Conversations</button>
         </div>
 
         <!-- USERS TAB -->
@@ -446,11 +446,11 @@
     </script>
 
     <script>
-        function showTab(tab) {
+        function showTab(e, tab) {
             document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
-            event.target.classList.add('active');
+            e.target.classList.add('active');
         }
     </script>
     <script>

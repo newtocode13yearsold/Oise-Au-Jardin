@@ -21,10 +21,11 @@
                 <li><a href="gardeners.html">Gardeners</a></li>
                 <li><a href="jobs.html">Jobs</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
+                <li><a href="faq.html">FAQ</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html'">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html'">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
+            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
             <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
                 <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
@@ -161,7 +162,7 @@
         if(user){
             currentUser=user;
             const d=await getDoc(doc(db,"users",user.uid));
-            if(d.exists()){const data=d.data();currentRole=data.role;document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(data.admin)document.getElementById('admin-nav-btn').style.display='inline';}
+            if(d.exists()){const data=d.data();currentRole=data.role;document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(user.email==='ciril8596@gmail.com')document.getElementById('admin-nav-btn').style.display='inline';}
             document.getElementById('btn-login').style.display='none';
             document.getElementById('btn-signup').style.display='none';
             document.getElementById('btn-logout').style.display='flex';
