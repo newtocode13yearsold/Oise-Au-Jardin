@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In - Oise au Jardin</title>
+    <title>Connexion - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="../images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         body {
             min-height: 100vh;
@@ -104,18 +108,39 @@
 
     <div class="auth-card">
         <img src="images/logo.png" alt="Oise au Jardin logo">
-        <h2>Log In</h2>
+        <h2>Se Connecter</h2>
 
-        <form action="#" method="POST">
-            <input type="email" name="email" placeholder="Your Email" required>
-            <input type="password" name="password" placeholder="Your Password" required>
-            <button type="submit" class="btn">Log In</button>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Votre e-mail" required>
+            <input type="password" id="login-password" placeholder="Votre mot de passe" required>
+            <p id="login-error" style="color:#c0392b;font-size:14px;display:none;margin-bottom:10px;"></p>
+            <button type="submit" class="btn" id="login-btn">Se connecter</button>
         </form>
 
-        <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+        <p>Pas encore de compte ? <a href="../signup.html/Signup.html">S'inscrire</a></p>
     </div>
 
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a href="../index.html" class="back-link">← Retour à l'accueil</a>
 
 </body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    const firebaseConfig = { apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI", authDomain:"oise-au-jardin.firebaseapp.com", projectId:"oise-au-jardin", storageBucket:"oise-au-jardin.firebasestorage.app", messagingSenderId:"895167286481", appId:"1:895167286481:web:6c4853a9c793c3aed149f0" };
+    const auth = getAuth(initializeApp(firebaseConfig));
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('login-btn');
+        const err = document.getElementById('login-error');
+        btn.disabled = true; btn.textContent = 'Connexion en cours...';
+        try {
+            await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+            window.location.href = '../profile.html';
+        } catch {
+            err.textContent = 'E-mail ou mot de passe incorrect.';
+            err.style.display = 'block';
+            btn.disabled = false; btn.textContent = 'Se connecter';
+        }
+    });
+</script>
 </html>

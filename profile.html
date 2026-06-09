@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - Oise au Jardin</title>
+    <title>Mon Profil - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </head>
 <body>
 
@@ -14,23 +18,23 @@
         <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
         <div class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="gardeners.html">Gardeners</a></li>
-                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="jobs.html">Offres</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
                 <li><a href="faq.html">FAQ</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;display:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Se connecter</button></li>
+            <li id="btn-signup" style="list-style:none;display:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">S'inscrire</button></li>
             <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
-                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 Mon profil</button>
                 <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
-                <button class="logout-btn" onclick="logout()">Log Out</button>
+                <button class="logout-btn" onclick="logout()">Se déconnecter</button>
             </li>
             <div class="translate-wrap">
-                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Langue</span> ▾</button>
                 <div class="translate-dropdown" id="translate-dropdown">
                     <a onclick="setLang('en')">🇬🇧 English</a>
                     <a onclick="setLang('fr')">🇫🇷 Français</a>
@@ -46,8 +50,8 @@
 
 <div class="profile-page">
     <div class="not-logged-in" id="not-logged-in" style="display:none;">
-        <p>You need to be logged in to view your profile.</p>
-        <a href="index.html">← Go back and log in</a>
+        <p>Vous devez être connecté pour voir votre profil.</p>
+        <a href="index.html">← Retour et connexion</a>
     </div>
 
     <div id="profile-card" class="profile-card" style="display:none;">
@@ -59,43 +63,43 @@
         <p class="profile-name" id="display-name"></p>
         <p class="profile-role" id="display-role"></p>
         <form onsubmit="saveProfile(event)" style="text-align:left;">
-            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Full Name</label>
-            <input type="text" id="field-name" placeholder="Your full name" required>
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Nom complet</label>
+            <input type="text" id="field-name" placeholder="Votre nom complet" required>
 
-            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Login Email</label>
-            <input type="email" id="field-email" placeholder="Your email" disabled style="opacity:0.5;cursor:not-allowed;">
-            <p style="font-size:12px;color:#94a3b8;margin-top:-10px;margin-bottom:14px;">To change your email, contact us at ciril8596@gmail.com</p>
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">E-mail de connexion</label>
+            <input type="email" id="field-email" placeholder="Votre e-mail" disabled style="opacity:0.5;cursor:not-allowed;">
+            <p style="font-size:12px;color:#94a3b8;margin-top:-10px;margin-bottom:14px;">Pour modifier votre e-mail, contactez-nous à ciril8596@gmail.com</p>
 
-            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">I am a</label>
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Je suis</label>
             <select id="field-role">
-                <option value="gardener">🌱 Young Gardener (looking for jobs)</option>
-                <option value="client">🏡 Client (looking for help)</option>
+                <option value="gardener">🌱 Jeune Jardinier (cherche des missions)</option>
+                <option value="client">🏡 Client (cherche de l'aide)</option>
             </select>
 
-            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Location</label>
-            <input type="text" id="field-location" placeholder="e.g. Compiègne">
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Localisation</label>
+            <input type="text" id="field-location" placeholder="ex. Compiègne">
 
-            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Public Contact Email</label>
-            <input type="email" id="field-contact" placeholder="Shown on your profile to other users">
+            <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">E-mail de contact public</label>
+            <input type="email" id="field-contact" placeholder="Affiché sur votre profil aux autres utilisateurs">
 
             <label style="font-size:12px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:5px;">Bio</label>
-            <textarea id="field-bio" placeholder="Write a short bio about yourself..."></textarea>
+            <textarea id="field-bio" placeholder="Écrivez une courte bio sur vous-même..."></textarea>
 
-            <button type="submit" class="save-btn">💾 Save Changes</button>
+            <button type="submit" class="save-btn">💾 Enregistrer</button>
         </form>
-        <p class="success-msg" id="success-msg">✅ Profile saved!</p>
+        <p class="success-msg" id="success-msg">✅ Profil enregistré !</p>
     </div>
 
     <div class="my-posts-section" id="my-posts-section" style="display:none;">
-        <h2>📋 My Posts</h2>
+        <h2>📋 Mes Publications</h2>
         <div id="my-posts-list"></div>
     </div>
 </div>
 
 <footer class="footer">
     <div class="container">
-        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
-        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p>🌿 <strong>Oise au Jardin</strong> — Plateforme de jardinage gratuite</p>
+        <p><a href="legal.html">Mentions légales</a> · <a href="legal.html">Confidentialité</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
         <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
     </div>
 </footer>
@@ -129,9 +133,9 @@
             const d=await getDoc(doc(db,"users",user.uid));
             if(d.exists()){
                 const data=d.data();
-                document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';
+                document.getElementById('welcome-msg').textContent='Bonjour, '+data.name+' !';
                 document.getElementById('display-name').textContent=data.name;
-                document.getElementById('display-role').textContent=data.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
+                document.getElementById('display-role').textContent=data.role==='gardener'?'🌱 Jeune Jardinier':'🏡 Client';
                 document.getElementById('field-name').value=data.name||'';
                 document.getElementById('field-email').value=user.email||'';
                 document.getElementById('field-role').value=data.role||'gardener';
@@ -154,12 +158,12 @@
         const list=document.getElementById('my-posts-list');list.innerHTML='';
         const gSnap=await getDocs(query(collection(db,"gardeners"),where("userId","==",uid)));
         const jSnap=await getDocs(query(collection(db,"jobs"),where("postedBy","==",uid)));
-        if(gSnap.empty&&jSnap.empty){list.innerHTML='<p class="empty-posts">You have no posts yet.</p>';return;}
-        gSnap.forEach(d=>{const x=d.data();list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('gardeners','${d.id}')">🗑 Delete</button><h3>🌿 Gardener Availability</h3><p>📍 ${x.location}</p><p>🛠 ${x.services}</p><p>€${x.price}/hr</p></div>`;});
-        jSnap.forEach(d=>{const x=d.data();const tasks=Array.isArray(x.tasks)?x.tasks.join(', '):(x.jobType||'');list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('jobs','${d.id}')">🗑 Delete</button><h3>🏡 Job Post</h3><p>📍 ${x.location}</p><p>🔧 ${tasks}</p><p>💰 Budget: €${x.budget}</p></div>`;});
+        if(gSnap.empty&&jSnap.empty){list.innerHTML='<p class="empty-posts">Vous n\'avez pas encore de publications.</p>';return;}
+        gSnap.forEach(d=>{const x=d.data();list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('gardeners','${d.id}')">🗑 Supprimer</button><h3>🌿 Disponibilité jardinier</h3><p>📍 ${x.location}</p><p>🛠 ${x.services}</p><p>€${x.price}/h</p></div>`;});
+        jSnap.forEach(d=>{const x=d.data();const tasks=Array.isArray(x.tasks)?x.tasks.join(', '):(x.jobType||'');list.innerHTML+=`<div class="my-post-card"><button class="delete-btn" onclick="deletePost('jobs','${d.id}')">🗑 Supprimer</button><h3>🏡 Offre publiée</h3><p>📍 ${x.location}</p><p>🔧 ${tasks}</p><p>💰 Budget : €${x.budget}</p></div>`;});
     }
 
-    window.deletePost=async function(col,id){if(!confirm('Delete this post?'))return;await deleteDoc(doc(db,col,id));loadMyPosts(currentUser.uid);}
+    window.deletePost=async function(col,id){if(!confirm('Supprimer cette publication ?'))return;await deleteDoc(doc(db,col,id));loadMyPosts(currentUser.uid);}
     window.handlePicChange=function(e){const file=e.target.files[0];if(!file)return;pendingPhotoFile=file;const r=new FileReader();r.onload=ev=>document.getElementById('profile-pic').src=ev.target.result;r.readAsDataURL(file);}
     window.saveProfile=async function(e){
         e.preventDefault();if(!currentUser)return;
@@ -168,8 +172,8 @@
         const newName=document.getElementById('field-name').value;
         const updates={name:newName,role:document.getElementById('field-role').value,location:document.getElementById('field-location').value,contactEmail:document.getElementById('field-contact').value,bio:document.getElementById('field-bio').value};
         document.getElementById('display-name').textContent=newName;
-        document.getElementById('display-role').textContent=updates.role==='gardener'?'🌱 Young Gardener':'🏡 Client';
-        document.getElementById('welcome-msg').textContent='Hi, '+newName+'!';
+        document.getElementById('display-role').textContent=updates.role==='gardener'?'🌱 Jeune Jardinier':'🏡 Client';
+        document.getElementById('welcome-msg').textContent='Bonjour, '+newName+' !';
         if(photoURL)updates.photoURL=photoURL;
         await updateDoc(doc(db,"users",currentUser.uid),updates);
         const s=document.getElementById('success-msg');s.style.display='block';setTimeout(()=>s.style.display='none',3000);pendingPhotoFile=null;
@@ -186,5 +190,6 @@
 <div style="display:none;" id="google_translate_element"></div>
 <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/ai-assistant.js"></script>
 </body>
 </html>

@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Oise au Jardin</title>
+    <title>Inscription - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="../images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         body {
             min-height: 100vh;
@@ -110,24 +114,111 @@
 
     <div class="auth-card">
         <img src="images/logo.png" alt="Oise au Jardin logo">
-        <h2>Sign Up</h2>
+        <h2>S'Inscrire</h2>
 
-        <form action="#" method="POST">
-            <input type="text" name="name" placeholder="Your Full Name" required>
-            <input type="email" name="email" placeholder="Your Email" required>
-            <input type="password" name="password" placeholder="Choose a Password" required>
-            <select name="role" required>
-                <option value="" disabled selected>I am a...</option>
-                <option value="gardener">Young Gardener (looking for jobs)</option>
-                <option value="client">Client (looking for help)</option>
+        <form id="signup-form">
+            <input type="text" id="signup-name" placeholder="Votre nom complet" required>
+            <input type="email" id="signup-email" placeholder="Votre e-mail" required>
+            <input type="password" id="signup-password" placeholder="Choisissez un mot de passe (min. 8 caractères)" minlength="8" required>
+            <select id="signup-role" required>
+                <option value="" disabled selected>Je suis...</option>
+                <option value="gardener">Jeune Jardinier (cherche des missions)</option>
+                <option value="client">Client (cherche de l'aide)</option>
             </select>
-            <button type="submit" class="btn">Create Account</button>
+
+            <label style="font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:5px;text-align:left;">Année de naissance</label>
+            <select id="signup-birthyear" required style="color:#333;">
+                <option value="" disabled selected>Sélectionnez votre année de naissance</option>
+            </select>
+
+            <div id="parental-consent-box" style="display:none;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:14px;margin-bottom:15px;text-align:left;">
+                <p style="font-size:13px;color:#7a5c00;margin:0 0 10px 0;">⚠️ Vous avez moins de 16 ans. La loi française exige l'autorisation d'un parent ou tuteur pour utiliser cette plateforme.</p>
+                <label style="font-size:13px;color:#555;display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+                    <input type="checkbox" id="parental-consent" style="width:auto;margin-top:2px;">
+                    <span>Mon parent ou tuteur a lu les <a href="../legal.html" target="_blank">Conditions d'utilisation</a> et m'autorise à utiliser Oise au Jardin.</span>
+                </label>
+            </div>
+
+            <div style="background:#f0f7f0;border-left:4px solid #2c5f2e;border-radius:6px;padding:12px 14px;margin-bottom:15px;text-align:left;">
+                <p style="font-size:12px;color:#2c5f2e;margin:0;">💶 <strong>Déclaration de revenus :</strong> Tout argent gagné via cette plateforme peut devoir être déclaré aux impôts français. Vous en êtes personnellement responsable. Oise au Jardin ne gère aucun paiement.</p>
+            </div>
+
+            <p id="signup-error" style="color:#c0392b;font-size:14px;display:none;margin-bottom:10px;"></p>
+            <button type="submit" class="btn" id="signup-btn">Créer mon compte</button>
         </form>
 
-        <p>Already have an account? <a href="login.html">Log In</a></p>
+        <p>Déjà inscrit ? <a href="../login.html/Login.html">Se connecter</a></p>
     </div>
 
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a href="../index.html" class="back-link">← Retour à l'accueil</a>
 
 </body>
+<script>
+    // Populate birth year dropdown (current year down to 1940)
+    const bySelect = document.getElementById('signup-birthyear');
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= 1940; y--) {
+        const opt = document.createElement('option');
+        opt.value = y; opt.textContent = y;
+        bySelect.appendChild(opt);
+    }
+    bySelect.addEventListener('change', function() {
+        const age = currentYear - parseInt(this.value);
+        const box = document.getElementById('parental-consent-box');
+        const checkbox = document.getElementById('parental-consent');
+        if (age < 14) {
+            document.getElementById('signup-error').textContent = 'Vous devez avoir au moins 14 ans pour utiliser cette plateforme.';
+            document.getElementById('signup-error').style.display = 'block';
+            box.style.display = 'none';
+            checkbox.required = false;
+        } else if (age < 16) {
+            document.getElementById('signup-error').style.display = 'none';
+            box.style.display = 'block';
+            checkbox.required = true;
+        } else {
+            document.getElementById('signup-error').style.display = 'none';
+            box.style.display = 'none';
+            checkbox.required = false;
+        }
+    });
+</script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    const firebaseConfig = { apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI", authDomain:"oise-au-jardin.firebaseapp.com", projectId:"oise-au-jardin", storageBucket:"oise-au-jardin.firebasestorage.app", messagingSenderId:"895167286481", appId:"1:895167286481:web:6c4853a9c793c3aed149f0" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('signup-btn');
+        const err = document.getElementById('signup-error');
+        const birthYear = parseInt(document.getElementById('signup-birthyear').value);
+        const age = new Date().getFullYear() - birthYear;
+        if (!birthYear || age < 14) {
+            err.textContent = 'Vous devez avoir au moins 14 ans pour utiliser cette plateforme.';
+            err.style.display = 'block'; return;
+        }
+        if (age < 16 && !document.getElementById('parental-consent').checked) {
+            err.textContent = 'L\'autorisation parentale est requise pour les utilisateurs de moins de 16 ans.';
+            err.style.display = 'block'; return;
+        }
+        const name = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+        const role = document.getElementById('signup-role').value;
+        if (!role) { err.textContent = 'Veuillez sélectionner votre rôle.'; err.style.display = 'block'; return; }
+        btn.disabled = true; btn.textContent = 'Création du compte...';
+        try {
+            const uc = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(doc(db, "users", uc.user.uid), { name, email, role, birthYear, parentalConsent: age < 16, location: '', bio: '', contactEmail: email, photoURL: '' });
+            window.location.href = '../profile.html';
+        } catch(e) {
+            err.textContent = e.code === 'auth/email-already-in-use' ? 'Un compte avec cet e-mail existe déjà.' : e.code === 'auth/weak-password' ? 'Le mot de passe doit contenir au moins 8 caractères.' : 'Une erreur est survenue. Veuillez réessayer.';
+            err.style.display = 'block';
+            btn.disabled = false; btn.textContent = 'Créer mon compte';
+        }
+    });
+</script>
 </html>

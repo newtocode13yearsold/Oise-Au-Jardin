@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legal - Oise au Jardin</title>
+    <title>Mentions légales - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         body { background: #f5f5f5; }
         .navbar { background-color: #2c5f2e; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
@@ -40,9 +44,9 @@
         <div class="container">
             <img src="images/logo.png" alt="logo" class="logo-img">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="gardeners.html">Gardeners</a></li>
-                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="jobs.html">Offres</a></li>
                 <li><a href="chat.html">Messages</a></li>
             </ul>
         </div>
@@ -50,115 +54,184 @@
 
     <div class="legal-page">
         <div class="legal-tabs">
-            <button class="tab-btn active" onclick="showTab(event,'terms')">📋 Terms of Service</button>
-            <button class="tab-btn" onclick="showTab(event,'privacy')">🔒 Privacy Policy</button>
+            <button class="tab-btn active" onclick="showTab(event,'terms')">📋 Conditions d'utilisation</button>
+            <button class="tab-btn" onclick="showTab(event,'privacy')">🔒 Politique de confidentialité</button>
+            <button class="tab-btn" onclick="showTab(event,'minors')">👶 Mineurs & Parents</button>
         </div>
 
-        <!-- TERMS OF SERVICE -->
+        <!-- CONDITIONS D'UTILISATION -->
         <div class="legal-card active" id="tab-terms">
-            <h1>Terms of Service</h1>
-            <p class="last-updated">Last updated: May 2026</p>
+            <h1>Conditions d'utilisation</h1>
+            <p class="last-updated">Dernière mise à jour : juin 2026</p>
 
             <div class="highlight-box">
-                <p>By using Oise au Jardin, you agree to these terms. Please read them carefully.</p>
+                <p>En utilisant Oise au Jardin, vous acceptez ces conditions. Veuillez les lire attentivement.</p>
             </div>
 
-            <h2>1. Who we are</h2>
-            <p>Oise au Jardin is a free platform created by Thomas Legros to connect young gardeners with clients who need gardening help in the Oise region of France. This is a non-commercial, free service.</p>
+            <h2>1. Qui sommes-nous</h2>
+            <p>Oise au Jardin est une plateforme gratuite et non commerciale créée par Thomas Legros (un mineur) pour mettre en relation de jeunes jardiniers avec des clients ayant besoin d'aide au jardin dans la région Oise. Cette plateforme est gérée à titre personnel, sans caractère professionnel, et ne génère aucun revenu.</p>
 
-            <h2>2. Who can use the platform</h2>
+            <h2>2. Qui peut utiliser la plateforme</h2>
             <ul>
-                <li>Anyone can browse gardeners and job posts without an account.</li>
-                <li>To post as a gardener or client, you must create a free account.</li>
-                <li>Gardeners must be young people (teenagers) looking for small gardening jobs.</li>
-                <li>You must provide accurate information when creating your account.</li>
+                <li>Toute personne âgée de <strong>14 ans ou plus</strong> peut créer un compte.</li>
+                <li>Les utilisateurs âgés de 14 à 15 ans <strong>doivent disposer de l'autorisation d'un parent ou tuteur</strong> pour utiliser cette plateforme.</li>
+                <li>Les personnes de moins de 14 ans ne sont pas autorisées à s'inscrire.</li>
+                <li>Vous devez fournir des informations exactes lors de la création de votre compte.</li>
             </ul>
 
-            <h2>3. What you can and cannot do</h2>
-            <p>You agree not to:</p>
+            <h2>3. Nature du service — pas une plateforme d'emploi</h2>
+            <div class="highlight-box">
+                <p>⚠️ Oise au Jardin est <strong>uniquement une plateforme de mise en relation</strong>. Ce n'est pas une agence d'emploi, une bourse du travail ou un service de placement. Nous n'embauchons personne, ne signons aucun contrat et n'organisons aucun travail directement.</p>
+            </div>
+            <p>Tout accord entre un jardinier et un client est conclu directement entre ces deux personnes, indépendamment de cette plateforme. Oise au Jardin n'est impliqué dans aucun accord, travail effectué, paiement, accident ou litige survenant entre utilisateurs, et décline toute responsabilité à cet égard.</p>
+
+            <h2>4. Obligation de déclaration des revenus</h2>
+            <p>En vertu du droit français, tout revenu perçu — y compris pour des missions de jardinage occasionnelles organisées via cette plateforme — peut faire l'objet d'une déclaration auprès de l'administration fiscale française (<em>Direction Générale des Finances Publiques</em>). Les utilisateurs sont personnellement et exclusivement responsables du respect de toutes les obligations fiscales et sociales applicables. Oise au Jardin ne traite, ne gère et n'enregistre aucun paiement entre utilisateurs.</p>
+
+            <h2>5. Respect du droit du travail des mineurs</h2>
+            <p>Le droit français (articles L4153-1 et suivants du <em>Code du travail</em>) encadre l'emploi des mineurs. Les jeunes jardiniers utilisant cette plateforme ne sont pas salariés d'Oise au Jardin. Tout travail occasionnel organisé via la plateforme entre un mineur et un client relève de la seule responsabilité des parties concernées. Les parents et tuteurs des utilisateurs mineurs sont responsables du respect des règles applicables au travail occasionnel des mineurs.</p>
+
+            <h2>6. Ce que vous pouvez et ne pouvez pas faire</h2>
+            <p>Vous vous engagez à ne pas :</p>
             <ul>
-                <li>Post false, misleading, or inappropriate content.</li>
-                <li>Harass, threaten, or harm other users.</li>
-                <li>Use the platform for any illegal activity.</li>
-                <li>Create multiple accounts or impersonate someone else.</li>
-                <li>Use the chat feature to send spam or unsolicited messages.</li>
+                <li>Publier des contenus faux, trompeurs ou inappropriés.</li>
+                <li>Harceler, menacer ou tenter de nuire à d'autres utilisateurs.</li>
+                <li>Utiliser la plateforme à des fins illégales.</li>
+                <li>Créer plusieurs comptes ou usurper l'identité d'une autre personne.</li>
+                <li>Utiliser la messagerie pour envoyer des spams ou des messages non sollicités.</li>
+                <li>Contacter des mineurs à des fins autres que l'organisation d'une aide au jardinage.</li>
             </ul>
 
-            <h2>4. Jobs and payments</h2>
-            <p>Oise au Jardin is only a platform to connect people — we are not involved in any agreement, payment, or job between gardeners and clients. Any arrangement made between users is entirely their own responsibility. We do not handle any money.</p>
+            <h2>7. Limitation de responsabilité</h2>
+            <p>Oise au Jardin est fourni « en l'état », sans aucune garantie. L'opérateur de la plateforme (Thomas Legros) ne peut être tenu responsable de toute perte, dommage, blessure ou préjudice résultant de l'utilisation de cette plateforme ou de l'exécution d'un travail organisé via celle-ci. Les utilisateurs interagissent entre eux à leurs propres risques.</p>
 
-            <h2>5. Content you post</h2>
-            <p>You are responsible for any content you post (job descriptions, availability posts, comments, messages). We reserve the right to remove any content that violates these terms.</p>
+            <h2>8. Contenus publiés</h2>
+            <p>Vous êtes responsable de tous les contenus que vous publiez. Nous nous réservons le droit de supprimer tout contenu contraire à ces conditions ou au droit français applicable.</p>
 
-            <h2>6. Account deletion</h2>
-            <p>You can ask us to delete your account and all your data at any time by contacting us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+            <h2>9. Suppression du compte</h2>
+            <p>Vous pouvez demander la suppression de votre compte et de toutes les données associées à tout moment en envoyant un e-mail à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. La suppression sera effectuée dans un délai de 30 jours.</p>
 
-            <h2>7. Changes to these terms</h2>
-            <p>We may update these terms occasionally. Continued use of the platform means you accept the updated terms.</p>
+            <h2>10. Droit applicable</h2>
+            <p>Les présentes conditions sont régies par le droit français. Tout litige relèvera de la compétence des tribunaux français.</p>
 
-            <h2>8. Contact</h2>
-            <p>For any questions about these terms, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+            <h2>11. Contact</h2>
+            <p>Pour toute question : <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
         </div>
 
-        <!-- PRIVACY POLICY -->
+        <!-- POLITIQUE DE CONFIDENTIALITÉ -->
         <div class="legal-card" id="tab-privacy">
-            <h1>Privacy Policy</h1>
-            <p class="last-updated">Last updated: May 2026</p>
+            <h1>Politique de confidentialité (RGPD)</h1>
+            <p class="last-updated">Dernière mise à jour : juin 2026</p>
 
             <div class="highlight-box">
-                <p>We respect your privacy. This policy explains what data we collect and how we use it, in compliance with GDPR (EU Regulation 2016/679).</p>
+                <p>Nous respectons votre vie privée. Cette politique explique quelles données nous collectons et comment nous les utilisons, conformément au règlement UE 2016/679 (RGPD) et au droit français.</p>
             </div>
 
-            <h2>1. Who is responsible for your data</h2>
-            <p>The data controller is Thomas Legros, reachable at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+            <h2>1. Responsable du traitement</h2>
+            <p>Le responsable du traitement est Thomas Legros, joignable à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. Cette plateforme est gérée à titre personnel et non commercial.</p>
 
-            <h2>2. What data we collect</h2>
+            <h2>2. Données concernant les mineurs</h2>
+            <p>En vertu de l'article 8 du RGPD et du droit français (Loi Informatique et Libertés), le traitement des données personnelles des utilisateurs de moins de 15 ans nécessite le consentement d'un parent ou tuteur. En cochant la case de consentement parental lors de l'inscription, le parent ou tuteur confirme son autorisation. Les parents peuvent demander la suppression des données de leur enfant à tout moment en nous contactant.</p>
+
+            <h2>3. Données collectées</h2>
             <ul>
-                <li><strong>Account data:</strong> your name, email address, and role (gardener or client).</li>
-                <li><strong>Profile data:</strong> your location, bio, contact email, and profile picture (only if you choose to add them).</li>
-                <li><strong>Posts:</strong> job posts or gardener availability posts you create.</li>
-                <li><strong>Messages:</strong> private messages sent between users.</li>
-                <li><strong>Comments:</strong> comments you leave on posts.</li>
-                <li><strong>Ratings:</strong> star ratings you give to gardeners.</li>
+                <li><strong>Données de compte :</strong> nom, adresse e-mail, année de naissance, rôle (jardinier ou client).</li>
+                <li><strong>Données de profil :</strong> localisation, bio, e-mail de contact, photo de profil (uniquement si vous choisissez de les renseigner).</li>
+                <li><strong>Publications :</strong> offres d'emploi ou publications de disponibilité que vous créez.</li>
+                <li><strong>Messages :</strong> messages privés entre utilisateurs.</li>
+                <li><strong>Consentement parental :</strong> pour les utilisateurs de moins de 16 ans, nous enregistrons que le consentement a été donné lors de l'inscription.</li>
             </ul>
 
-            <h2>3. Why we collect this data</h2>
+            <h2>4. Base légale du traitement</h2>
             <ul>
-                <li>To let you create an account and log in.</li>
-                <li>To display your profile and posts to other users.</li>
-                <li>To allow private messaging between users.</li>
-                <li>We do not use your data for advertising or marketing.</li>
+                <li>Pour les utilisateurs de 16 ans et plus : votre <strong>consentement</strong> donné lors de l'inscription.</li>
+                <li>Pour les utilisateurs de moins de 16 ans : le <strong>consentement parental</strong> donné lors de l'inscription.</li>
             </ul>
 
-            <h2>4. Who can see your data</h2>
+            <h2>5. Utilisation de vos données</h2>
             <ul>
-                <li>Your name, location, bio, and contact email are visible to other users if you fill them in.</li>
-                <li>Your messages are only visible to you and the person you are chatting with.</li>
-                <li>Your email address used to log in is never shown publicly.</li>
+                <li>Pour vous permettre de créer un compte et de vous connecter.</li>
+                <li>Pour afficher votre profil et vos publications aux autres utilisateurs connectés.</li>
+                <li>Pour permettre la messagerie privée entre utilisateurs.</li>
+                <li>Nous ne vendons, ne partageons et n'utilisons <strong>jamais</strong> vos données à des fins publicitaires ou marketing.</li>
             </ul>
 
-            <h2>5. Where your data is stored</h2>
-            <p>Your data is stored securely using Google Firebase (Firestore and Firebase Authentication), which is hosted on Google's servers in Europe. Google complies with GDPR.</p>
-
-            <h2>6. How long we keep your data</h2>
-            <p>We keep your data for as long as your account exists. If you ask us to delete your account, we will delete all your data within 30 days.</p>
-
-            <h2>7. Your rights under GDPR</h2>
-            <p>You have the right to:</p>
+            <h2>6. Qui peut voir vos données</h2>
             <ul>
-                <li><strong>Access</strong> your personal data.</li>
-                <li><strong>Correct</strong> any inaccurate data.</li>
-                <li><strong>Delete</strong> your data (right to be forgotten).</li>
-                <li><strong>Object</strong> to how we process your data.</li>
-                <li><strong>Withdraw consent</strong> at any time.</li>
+                <li>Votre nom, localisation, bio et e-mail de contact sont visibles par les autres utilisateurs connectés, si vous les renseignez.</li>
+                <li>Vos messages privés ne sont visibles que par vous et votre interlocuteur.</li>
+                <li>Votre e-mail de connexion et votre année de naissance ne sont jamais affichés publiquement.</li>
             </ul>
-            <p>To exercise any of these rights, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
 
-            <h2>8. Cookies</h2>
-            <p>We use minimal cookies only for keeping you logged in and for the Google Translate feature. We do not use tracking or advertising cookies.</p>
+            <h2>7. Lieu de stockage des données</h2>
+            <p>Les données sont stockées via Google Firebase (Firestore et Firebase Authentication), hébergé sur des serveurs Google situés dans l'UE. Google est conforme au RGPD. Aucune donnée n'est transférée en dehors de l'UE.</p>
 
-            <h2>9. Contact</h2>
-            <p>For any privacy questions, contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. You also have the right to file a complaint with the French data protection authority (CNIL) at <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>.</p>
+            <h2>8. Durée de conservation</h2>
+            <p>Nous conservons vos données aussi longtemps que votre compte est actif. Suite à une demande de suppression de compte, toutes les données sont effacées dans un délai de 30 jours.</p>
+
+            <h2>9. Vos droits au titre du RGPD</h2>
+            <p>Vous (ou votre parent/tuteur si vous avez moins de 16 ans) disposez du droit :</p>
+            <ul>
+                <li><strong>D'accès</strong> à vos données personnelles.</li>
+                <li><strong>De rectification</strong> des données inexactes.</li>
+                <li><strong>D'effacement</strong> de vos données (droit à l'oubli).</li>
+                <li><strong>De limitation</strong> ou d'<strong>opposition</strong> au traitement.</li>
+                <li><strong>De retrait du consentement</strong> à tout moment.</li>
+                <li><strong>À la portabilité</strong> — recevoir vos données dans un format lisible.</li>
+            </ul>
+            <p>Pour exercer l'un de ces droits, écrivez à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. Vous avez également le droit de déposer une plainte auprès de la CNIL à <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>.</p>
+
+            <h2>10. Cookies</h2>
+            <p>Nous utilisons un minimum de cookies : un pour maintenir votre connexion (strictement nécessaire) et un pour Google Translate. Nous n'utilisons pas de cookies de pistage, de profilage ou publicitaires. Vous pouvez refuser les cookies non essentiels via la bannière affichée lors de votre première visite.</p>
+
+            <h2>11. Contact</h2>
+            <p>Questions relatives à la confidentialité : <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
+        </div>
+
+        <!-- MINEURS & PARENTS -->
+        <div class="legal-card" id="tab-minors">
+            <h1>Informations pour les Mineurs et les Parents</h1>
+            <p class="last-updated">Dernière mise à jour : juin 2026</p>
+
+            <div class="highlight-box">
+                <p>Cette page explique comment Oise au Jardin respecte le droit français relatif aux mineurs, au travail occasionnel et à la protection des données.</p>
+            </div>
+
+            <h2>Conditions d'âge</h2>
+            <ul>
+                <li><strong>Moins de 14 ans :</strong> l'inscription n'est pas autorisée.</li>
+                <li><strong>14–15 ans :</strong> une autorisation parentale ou d'un tuteur est requise lors de l'inscription.</li>
+                <li><strong>16 ans et plus :</strong> peuvent s'inscrire de manière autonome.</li>
+            </ul>
+
+            <h2>Ce n'est pas de l'emploi</h2>
+            <p>Oise au Jardin est une plateforme gratuite de mise en relation — pas un employeur, une agence de travail temporaire ou un service de placement. Les jeunes jardiniers qui trouvent des clients via cette plateforme ne sont <strong>pas salariés</strong> d'Oise au Jardin ni de l'opérateur de la plateforme. Tout accord de jardinage est conclu directement et de manière informelle entre le jeune et le client.</p>
+
+            <h2>Responsabilité parentale</h2>
+            <p>Les parents et tuteurs des utilisateurs mineurs sont responsables de :</p>
+            <ul>
+                <li>Surveiller l'utilisation de la plateforme par leur enfant.</li>
+                <li>S'assurer que tout travail organisé est approprié et sécurisé.</li>
+                <li>Veiller au respect des règles françaises sur les travaux légers occasionnels des mineurs (<em>travaux légers occasionnels</em>).</li>
+                <li>Déclarer les revenus éventuellement perçus par leur enfant, si applicable.</li>
+            </ul>
+
+            <h2>Revenus et obligations fiscales</h2>
+            <p>En vertu du droit fiscal français, tout revenu perçu — même ponctuellement — peut devoir être déclaré. Cela relève de la seule responsabilité de l'utilisateur et de sa famille. Pour de petits montants, le système du « Chèque Emploi Service Universel » (CESU) peut simplifier les démarches pour les clients qui font appel à une aide occasionnelle.</p>
+
+            <h2>Recommandations de sécurité</h2>
+            <ul>
+                <li>Les mineurs doivent toujours prévenir un parent ou un adulte de confiance avant de rencontrer un client.</li>
+                <li>Les premières rencontres doivent se dérouler dans un lieu public ou en présence d'un parent.</li>
+                <li>Ne communiquez jamais votre adresse personnelle, votre numéro de téléphone ou vos coordonnées bancaires sur votre profil public.</li>
+                <li>Si vous êtes victime d'un comportement inapproprié, signalez-le immédiatement à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> et, si nécessaire, aux autorités compétentes.</li>
+            </ul>
+
+            <h2>Demande de suppression des données de votre enfant</h2>
+            <p>Les parents peuvent demander la suppression complète du compte et des données de leur enfant à tout moment en envoyant un e-mail à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. La suppression est effectuée dans un délai de 30 jours.</p>
+
+            <h2>Contact</h2>
+            <p>Pour toute question ou préoccupation : <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>.</p>
         </div>
     </div>
 

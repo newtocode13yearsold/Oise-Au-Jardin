@@ -1,12 +1,29 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "oiseaujardin",
+  "main": "src/worker.js",
   "compatibility_date": "2026-05-18",
   "observability": {
     "enabled": true
   },
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "exclude": [
+      ".git/**",
+      ".claude/**",
+      ".wrangler/**",
+      "node_modules/**",
+      "src/**",
+      "firebase.json",
+      "firestore.rules",
+      "wrangler.jsonc",
+      "package.json",
+      "package-lock.json",
+      "vite.config.js",
+      "LICENSE",
+      "README.md",
+      ".gitignore"
+    ]
   },
   "compatibility_flags": [
     "nodejs_compat"

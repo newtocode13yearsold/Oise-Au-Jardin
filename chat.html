@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Messages - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </head>
 <body>
 
@@ -14,23 +18,23 @@
         <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
         <div class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="gardeners.html">Gardeners</a></li>
-                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="jobs.html">Offres</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
                 <li><a href="faq.html">FAQ</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;display:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Se connecter</button></li>
+            <li id="btn-signup" style="list-style:none;display:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">S'inscrire</button></li>
             <li id="btn-logout" style="display:none;list-style:none;align-items:center;gap:6px;flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
-                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 Mon profil</button>
                 <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
-                <button class="logout-btn" onclick="logout()">Log Out</button>
+                <button class="logout-btn" onclick="logout()">Se déconnecter</button>
             </li>
             <div class="translate-wrap">
-                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Langue</span> ▾</button>
                 <div class="translate-dropdown" id="translate-dropdown">
                     <a onclick="setLang('en')">🇬🇧 English</a>
                     <a onclick="setLang('fr')">🇫🇷 Français</a>
@@ -45,44 +49,44 @@
 </nav>
 
 <div class="not-logged-in" id="not-logged-in" style="display:none;">
-    <p>You need to be logged in to use messages.</p>
-    <a href="index.html">← Go back and log in</a>
+    <p>Vous devez être connecté pour accéder aux messages.</p>
+    <a href="index.html">← Retour et connexion</a>
 </div>
 
 <div class="chat-page" id="chat-page" style="display:none;">
     <div class="conversations">
         <h3>💬 Messages</h3>
         <div class="conv-search">
-            <input type="text" id="conv-search-input" placeholder="Search conversations..." oninput="filterConversations()">
+            <input type="text" id="conv-search-input" placeholder="Rechercher une conversation..." oninput="filterConversations()">
         </div>
         <div class="conv-list-inner" id="conv-list">
-            <p class="no-convs">No conversations yet.</p>
+            <p class="no-convs">Aucune conversation pour l'instant.</p>
         </div>
     </div>
     <div class="chat-window">
         <div class="chat-placeholder" id="chat-placeholder">
             <span>💬</span>
-            Select a conversation to start chatting
+            Sélectionnez une conversation pour commencer
         </div>
         <div id="chat-header" class="chat-header" style="display:none;">
             <img id="chat-header-pic" src="" alt="">
             <div>
                 <div class="chat-header-name" id="chat-header-name"></div>
-                <div class="chat-header-status">Active on Oise au Jardin</div>
+                <div class="chat-header-status">Actif sur Oise au Jardin</div>
             </div>
         </div>
         <div class="messages-area" id="messages-area" style="display:none;"></div>
         <div class="chat-input-area" id="chat-input-area" style="display:none;">
-            <input type="text" id="msg-input" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMessage()">
-            <button class="send-btn" onclick="sendMessage()">Send ➤</button>
+            <input type="text" id="msg-input" placeholder="Écrire un message..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">Envoyer ➤</button>
         </div>
     </div>
 </div>
 
 <footer class="footer">
     <div class="container">
-        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform</p>
-        <p><a href="legal.html">Terms</a> · <a href="legal.html">Privacy</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
+        <p>🌿 <strong>Oise au Jardin</strong> — Plateforme de jardinage gratuite</p>
+        <p><a href="legal.html">Mentions légales</a> · <a href="legal.html">Confidentialité</a> · <a href="mailto:ciril8596@gmail.com">Contact</a></p>
         <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
     </div>
 </footer>
@@ -113,7 +117,7 @@
             document.getElementById('chat-page').style.display='flex';
             document.getElementById('not-logged-in').style.display='none';
             const d=await getDoc(doc(db,"users",user.uid));
-            if(d.exists()){const data=d.data();document.getElementById('welcome-msg').textContent='Hi, '+data.name+'!';if(user.email==='ciril8596@gmail.com')document.getElementById('admin-nav-btn').style.display='inline';}
+            if(d.exists()){const data=d.data();document.getElementById('welcome-msg').textContent='Bonjour, '+data.name+' !';if(user.email==='ciril8596@gmail.com')document.getElementById('admin-nav-btn').style.display='inline';}
             const params=new URLSearchParams(window.location.search);
             const withUser=params.get('with');
             if(withUser)openChatWith(withUser);
@@ -132,7 +136,7 @@
         const q=query(collection(db,"chats"),where("participants","array-contains",currentUser.uid));
         onSnapshot(q,async snap=>{
             allConversations=[];
-            if(snap.empty){convList.innerHTML='<p class="no-convs">No conversations yet.<br>Click "Message" on a gardener or job to start chatting!</p>';return;}
+            if(snap.empty){convList.innerHTML='<p class="no-convs">Aucune conversation pour l\'instant.<br>Cliquez sur « Message » sur un jardinier ou une offre pour commencer !</p>';return;}
             for(const d of snap.docs){
                 const data=d.data();
                 const otherId=data.participants.find(p=>p!==currentUser.uid);
@@ -142,7 +146,7 @@
                     const other=od.data();
                     const pic=other.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(other.name)}&background=2c5f2e&color=fff&size=42`;
                     const uSnap=await getDocs(query(collection(db,"chats",d.id,"messages"),where("senderId","!=",currentUser.uid),where("read","==",false)));
-                    allConversations.push({id:d.id,otherId,name:other.name,pic,preview:data.lastMessage||'No messages yet',unread:uSnap.size});
+                    allConversations.push({id:d.id,otherId,name:other.name,pic,preview:data.lastMessage||'Aucun message pour l\'instant',unread:uSnap.size});
                 }catch(e){}
             }
             renderConversations(allConversations);
@@ -152,7 +156,7 @@
     function renderConversations(convs){
         const convList=document.getElementById('conv-list');
         convList.innerHTML='';
-        if(convs.length===0){convList.innerHTML='<p class="no-convs">No conversations found.</p>';return;}
+        if(convs.length===0){convList.innerHTML='<p class="no-convs">Aucune conversation trouvée.</p>';return;}
         convs.forEach(c=>{
             const el=document.createElement('div');
             el.className=`conv-item${currentChatId===c.id?' active':''}`;
@@ -219,7 +223,7 @@
         try{
             await addDoc(collection(db,"chats",currentChatId,"messages"),{text,senderId:currentUser.uid,read:false,createdAt:new Date()});
             await setDoc(doc(db,"chats",currentChatId),{lastMessage:text,updatedAt:new Date()},{merge:true});
-        }catch(err){console.error('Send error:',err);alert('Could not send message. Please try again.');}
+        }catch(err){console.error('Send error:',err);alert('Impossible d\'envoyer le message. Veuillez réessayer.');}
     }
 
     window.logout=async function(){await signOut(auth);location.href='index.html';}
@@ -234,5 +238,6 @@
 <div style="display:none;" id="google_translate_element"></div>
 <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/ai-assistant.js"></script>
 </body>
 </html>

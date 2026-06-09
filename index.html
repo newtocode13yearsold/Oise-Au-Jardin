@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oise au Jardin — Young Gardeners Near You</title>
+    <title>Oise au Jardin — Jeunes Jardiniers Près de Chez Vous</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         .hero { background: linear-gradient(135deg, rgba(26,58,28,0.88), rgba(44,95,46,0.75)), url("./images/lawn.jpg"); background-size: cover; background-position: center; }
     </style>
@@ -17,24 +21,24 @@
         <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
         <div class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="gardeners.html">Gardeners</a></li>
-                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="index.html" class="active">Accueil</a></li>
+                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="jobs.html">Offres</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
                 <li><a href="faq.html">FAQ</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="openModal('login')">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="openModal('signup')">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;display:none;"><button class="auth-btn" onclick="openModal('login')">Se connecter</button></li>
+            <li id="btn-signup" style="list-style:none;display:none;"><button class="signup-btn" onclick="openModal('signup')">S'inscrire</button></li>
             <li id="btn-logout" style="display:none; list-style:none; align-items:center; gap:6px; flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
-                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 Mon profil</button>
                 <button id="admin-nav-btn" class="admin-btn" onclick="location.href='admin.html'" style="display:none;">⚙️ Admin</button>
-                <button class="logout-btn" onclick="logout()">Log Out</button>
+                <button class="logout-btn" onclick="logout()">Se déconnecter</button>
             </li>
             <div class="translate-wrap">
-                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Langue</span> ▾</button>
                 <div class="translate-dropdown" id="translate-dropdown">
                     <a onclick="setLang('en')">🇬🇧 English</a>
                     <a onclick="setLang('fr')">🇫🇷 Français</a>
@@ -53,14 +57,14 @@
     <div class="auth-card">
         <button class="close-btn" onclick="closeModal('login')">✕</button>
         <img src="images/logo.png" alt="logo">
-        <h2>Welcome back</h2>
+        <h2>Bon retour</h2>
         <p class="error-msg" id="login-error"></p>
         <form onsubmit="handleLogin(event)">
-            <input type="email" id="login-email" placeholder="Your Email" required>
-            <input type="password" id="login-password" placeholder="Your Password" required>
-            <button type="submit" class="btn">Log In</button>
+            <input type="email" id="login-email" placeholder="Votre e-mail" required>
+            <input type="password" id="login-password" placeholder="Votre mot de passe" required>
+            <button type="submit" class="btn">Se connecter</button>
         </form>
-        <p>No account? <a onclick="switchModal('login','signup')">Sign Up</a></p>
+        <p>Pas de compte ? <a onclick="switchModal('login','signup')">S'inscrire</a></p>
     </div>
 </div>
 
@@ -69,32 +73,32 @@
     <div class="auth-card">
         <button class="close-btn" onclick="closeModal('signup')">✕</button>
         <img src="images/logo.png" alt="logo">
-        <h2>Create account</h2>
+        <h2>Créer un compte</h2>
         <p class="error-msg" id="signup-error"></p>
         <form onsubmit="handleSignup(event)">
-            <input type="text" id="signup-name" placeholder="Your Full Name" required>
-            <input type="email" id="signup-email" placeholder="Your Email" required>
-            <input type="password" id="signup-password" placeholder="Choose a Password" required>
+            <input type="text" id="signup-name" placeholder="Votre nom complet" required>
+            <input type="email" id="signup-email" placeholder="Votre e-mail" required>
+            <input type="password" id="signup-password" placeholder="Choisissez un mot de passe" required>
             <select id="signup-role" required>
-                <option value="" disabled selected>I am a...</option>
-                <option value="gardener">🌱 Young Gardener (looking for jobs)</option>
-                <option value="client">🏡 Client (looking for help)</option>
+                <option value="" disabled selected>Je suis...</option>
+                <option value="gardener">🌱 Jeune Jardinier (cherche des missions)</option>
+                <option value="client">🏡 Client (cherche de l'aide)</option>
             </select>
-            <button type="submit" class="btn">Create Account</button>
+            <button type="submit" class="btn">Créer mon compte</button>
         </form>
-        <p>Already have one? <a onclick="switchModal('signup','login')">Log In</a></p>
+        <p>Déjà inscrit ? <a onclick="switchModal('signup','login')">Se connecter</a></p>
     </div>
 </div>
 
 <!-- HERO -->
 <header id="home" class="hero">
     <div class="hero-inner">
-        <div class="hero-badge">🌿 Oise Region · Completely Free</div>
-        <h1>Find a <em>Young Gardener</em><br>Near You</h1>
-        <p>Connecting motivated teens with clients who need garden help — no fees, no subscriptions, ever.</p>
+        <div class="hero-badge">🌿 Région Oise · 100% Gratuit</div>
+        <h1>Trouvez un <em>Jeune Jardinier</em><br>Près de Chez Vous</h1>
+        <p>Mettez en relation des ados motivés avec des clients qui ont besoin d'aide au jardin — sans frais, sans abonnement, jamais.</p>
         <div class="hero-btns">
-            <button class="hero-btn-primary" onclick="location.href='gardeners.html'">🌱 Find a Gardener</button>
-            <button class="hero-btn-secondary" onclick="location.href='jobs.html'">🏡 Post a Job</button>
+            <button class="hero-btn-primary" onclick="location.href='gardeners.html'">🌱 Trouver un Jardinier</button>
+            <button class="hero-btn-secondary" onclick="location.href='jobs.html'">🏡 Publier une Offre</button>
         </div>
     </div>
 </header>
@@ -102,11 +106,11 @@
 <!-- TRUST STRIP -->
 <div class="trust-strip">
     <div class="container">
-        <div class="trust-item"><div class="ti-icon">✅</div> 100% Free — always</div>
-        <div class="trust-item"><div class="ti-icon">🌍</div> Oise Region, France</div>
-        <div class="trust-item"><div class="ti-icon">💬</div> Direct messaging</div>
-        <div class="trust-item"><div class="ti-icon">⭐</div> Rated gardeners</div>
-        <div class="trust-item"><div class="ti-icon">🔒</div> GDPR compliant</div>
+        <div class="trust-item"><div class="ti-icon">✅</div> 100% Gratuit — toujours</div>
+        <div class="trust-item"><div class="ti-icon">🌍</div> Région Oise, France</div>
+        <div class="trust-item"><div class="ti-icon">💬</div> Messagerie directe</div>
+        <div class="trust-item"><div class="ti-icon">⭐</div> Jardiniers notés</div>
+        <div class="trust-item"><div class="ti-icon">🔒</div> Conforme au RGPD</div>
     </div>
 </div>
 
@@ -114,15 +118,15 @@
 <section id="about" class="about">
     <div class="container">
         <div class="about-text">
-            <span class="section-tag">Our Story</span>
-            <h2>Built by a teen,<br>for young people</h2>
-            <p>My name is Thomas Legros. I'm 14 years old and I built this platform because I wanted to find small gardening jobs myself — but every platform I found was expensive or too complicated. So I made my own, completely free.</p>
-            <p>Oise au Jardin connects young gardeners looking to earn pocket money with local clients who need reliable help in their garden.</p>
-            <span class="about-tag">🌱 This is also my first ever portfolio project!</span>
+            <span class="section-tag">Notre histoire</span>
+            <h2>Créé par un ado,<br>pour les jeunes</h2>
+            <p>Je m'appelle Thomas Legros. J'ai 14 ans et j'ai créé cette plateforme parce que je voulais trouver de petits jobs de jardinage — mais toutes les plateformes que je trouvais étaient payantes ou trop compliquées. Alors j'ai fait la mienne, entièrement gratuite.</p>
+            <p>Oise au Jardin met en relation de jeunes jardiniers qui veulent gagner de l'argent de poche avec des clients locaux qui ont besoin d'aide fiable dans leur jardin.</p>
+            <span class="about-tag">🌱 C'est aussi mon tout premier projet portfolio !</span>
         </div>
         <div class="about-visual">
             <div class="big-icon">🌿</div>
-            <p>Teens earning.<br>Gardens thriving.<br>Always free.</p>
+            <p>Des ados qui gagnent.<br>Des jardins qui s'épanouissent.<br>Toujours gratuit.</p>
         </div>
     </div>
 </section>
@@ -131,25 +135,25 @@
 <section id="services" class="services">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">How It Works</span>
-            <h2>Three simple steps</h2>
-            <p class="section-subtitle">Getting started takes less than 2 minutes</p>
+            <span class="section-tag">Comment ça marche</span>
+            <h2>Trois étapes simples</h2>
+            <p class="section-subtitle">Se lancer prend moins de 2 minutes</p>
         </div>
         <div class="service-grid">
             <div class="service-card">
                 <div class="service-icon-wrap">🌱</div>
-                <h3>Find a Gardener</h3>
-                <p>Browse young gardeners in your area. See their services, hourly price, star ratings, and availability — then message them directly.</p>
+                <h3>Trouver un Jardinier</h3>
+                <p>Parcourez les jeunes jardiniers de votre secteur. Consultez leurs services, tarifs horaires, notes et disponibilités — puis envoyez-leur un message directement.</p>
             </div>
             <div class="service-card">
                 <div class="service-icon-wrap">🏡</div>
-                <h3>Post a Job</h3>
-                <p>Need garden help? Post your job in seconds. Describe the tasks, your budget and date — motivated gardeners will reach out.</p>
+                <h3>Publier une Offre</h3>
+                <p>Besoin d'aide au jardin ? Publiez votre offre en quelques secondes. Décrivez les tâches, votre budget et la date — des jardiniers motivés vous contacteront.</p>
             </div>
             <div class="service-card">
                 <div class="service-icon-wrap">💸</div>
-                <h3>Always Free</h3>
-                <p>Oise au Jardin is completely free for everyone — no subscriptions, no commissions, no hidden fees. Ever.</p>
+                <h3>Toujours Gratuit</h3>
+                <p>Oise au Jardin est entièrement gratuit pour tout le monde — sans abonnement, sans commission, sans frais cachés. Jamais.</p>
             </div>
         </div>
     </div>
@@ -159,16 +163,16 @@
 <section id="contact" class="contact">
     <div class="container">
         <div class="section-header">
-            <span class="section-tag">Get in Touch</span>
-            <h2>Any questions?</h2>
-            <p class="section-subtitle">We'd love to hear from you — we reply fast.</p>
+            <span class="section-tag">Nous Contacter</span>
+            <h2>Des questions ?</h2>
+            <p class="section-subtitle">Nous serons ravis de vous répondre — nous répondons rapidement.</p>
         </div>
-        <div class="success-banner" id="success-banner">✅ Message sent! We'll get back to you soon.</div>
+        <div class="success-banner" id="success-banner">✅ Message envoyé ! Nous vous répondrons bientôt.</div>
         <form class="contact-form" id="contact-form" onsubmit="sendContactForm(event)">
-            <input type="text" id="contact-name" placeholder="Your Name" required>
-            <input type="email" id="contact-email" placeholder="Your Email" required>
-            <textarea id="contact-message" placeholder="Your Message" rows="5" required></textarea>
-            <div style="text-align:center;"><button type="submit" class="btn">Send Message →</button></div>
+            <input type="text" id="contact-name" placeholder="Votre nom" required>
+            <input type="email" id="contact-email" placeholder="Votre e-mail" required>
+            <textarea id="contact-message" placeholder="Votre message" rows="5" required></textarea>
+            <div style="text-align:center;"><button type="submit" class="btn">Envoyer →</button></div>
         </form>
     </div>
 </section>
@@ -179,29 +183,29 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <strong>🌿 Oise au Jardin</strong>
-                <p>A free platform connecting young gardeners with clients in the Oise region of France. Built with ❤️ by Thomas Legros, 14 years old.</p>
+                <p>Une plateforme gratuite mettant en relation jeunes jardiniers et clients dans la région Oise. Créée avec ❤️ par Thomas Legros, 14 ans.</p>
             </div>
             <div class="footer-links">
-                <a href="gardeners.html">Find a Gardener</a>
-                <a href="jobs.html">Post a Job</a>
+                <a href="gardeners.html">Trouver un Jardinier</a>
+                <a href="jobs.html">Publier une Offre</a>
                 <a href="faq.html">FAQ</a>
-                <a href="legal.html">Terms & Privacy</a>
-                <a href="mailto:ciril8596@gmail.com">Contact Us</a>
+                <a href="legal.html">Mentions légales</a>
+                <a href="mailto:ciril8596@gmail.com">Nous Contacter</a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 Oise au Jardin — Always free, always local.</p>
-            <p><a href="legal.html" style="color:rgba(255,255,255,0.4);">Terms</a> &nbsp;·&nbsp; <a href="legal.html" style="color:rgba(255,255,255,0.4);">Privacy</a></p>
+            <p>© 2026 Oise au Jardin — Toujours gratuit, toujours local.</p>
+            <p><a href="legal.html" style="color:rgba(255,255,255,0.4);">Mentions légales</a> &nbsp;·&nbsp; <a href="legal.html" style="color:rgba(255,255,255,0.4);">Confidentialité</a></p>
         </div>
     </div>
 </footer>
 
 <!-- COOKIE BANNER -->
 <div class="cookie-banner" id="cookie-banner">
-    <p>🍪 We use cookies to keep you logged in. By continuing you accept our <a href="legal.html">Terms & Privacy Policy</a>.</p>
+    <p>🍪 Nous utilisons des cookies pour maintenir votre connexion. En continuant, vous acceptez nos <a href="legal.html">Mentions légales et Politique de confidentialité</a>.</p>
     <div style="display:flex;gap:8px;flex-shrink:0;">
-        <button class="cookie-accept" onclick="acceptCookies()">✅ Accept</button>
-        <button class="cookie-decline" onclick="declineCookies()">Decline</button>
+        <button class="cookie-accept" onclick="acceptCookies()">✅ Accepter</button>
+        <button class="cookie-decline" onclick="declineCookies()">Refuser</button>
     </div>
 </div>
 
@@ -232,7 +236,7 @@
             document.getElementById('btn-login').style.display = 'none';
             document.getElementById('btn-signup').style.display = 'none';
             document.getElementById('btn-logout').style.display = 'flex';
-            document.getElementById('welcome-msg').textContent = 'Hi, ' + (data.name || '') + '!';
+            document.getElementById('welcome-msg').textContent = 'Bonjour, ' + (data.name || '') + ' !';
             if (user.email === 'ciril8596@gmail.com') document.getElementById('admin-nav-btn').style.display = 'inline';
             const nf = document.getElementById('contact-name');
             const ef = document.getElementById('contact-email');
@@ -260,7 +264,7 @@
         e.preventDefault();
         const err = document.getElementById('login-error');
         try { await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value); closeModal('login'); }
-        catch(e) { err.style.display = 'block'; err.textContent = 'Wrong email or password.'; }
+        catch(e) { err.style.display = 'block'; err.textContent = 'E-mail ou mot de passe incorrect.'; }
     }
     window.logout = async function() { await signOut(auth); localStorage.removeItem('cookieConsent'); }
 </script>
@@ -280,8 +284,8 @@
         try {
             const r = await fetch('https://formspree.io/f/mkoyzggz', { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({ name: document.getElementById('contact-name').value, email: document.getElementById('contact-email').value, message: document.getElementById('contact-message').value }) });
             if (r.ok) { document.getElementById('contact-form').reset(); document.getElementById('success-banner').style.display = 'block'; setTimeout(() => document.getElementById('success-banner').style.display = 'none', 5000); }
-            else alert('Something went wrong. Email ciril8596@gmail.com directly.');
-        } catch { alert('Could not send. Email ciril8596@gmail.com directly.'); }
+            else alert('Une erreur est survenue. Contactez ciril8596@gmail.com directement.');
+        } catch { alert('Impossible d\'envoyer. Contactez ciril8596@gmail.com directement.'); }
     }
     function toggleMenu() { const m = document.getElementById('nav-menu'); const h = document.getElementById('hamburger'); m.classList.toggle('open'); h.classList.toggle('open'); }
     function toggleTranslate() { document.getElementById('translate-dropdown').classList.toggle('open'); }
@@ -301,5 +305,6 @@
 <div style="display:none;" id="google_translate_element"></div>
 <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/ai-assistant.js"></script>
 </body>
 </html>

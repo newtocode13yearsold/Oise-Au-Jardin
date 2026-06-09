@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c5f2e">
+    <link rel="apple-touch-icon" href="images/logo.png">
+    <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         .faq-hero {
             background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url("./images/lawn.jpg");
@@ -109,22 +113,22 @@
         <button class="hamburger" id="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
         <div class="nav-menu" id="nav-menu">
             <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="gardeners.html">Gardeners</a></li>
-                <li><a href="jobs.html">Jobs</a></li>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="jobs.html">Offres</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
                 <li><a href="faq.html" class="active">FAQ</a></li>
                 <li class="nav-divider"></li>
             </ul>
-            <li id="btn-login" style="list-style:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Log In</button></li>
-            <li id="btn-signup" style="list-style:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">Sign Up</button></li>
+            <li id="btn-login" style="list-style:none;display:none;"><button class="auth-btn" onclick="location.href='index.html#login'">Se connecter</button></li>
+            <li id="btn-signup" style="list-style:none;display:none;"><button class="signup-btn" onclick="location.href='index.html#signup'">S'inscrire</button></li>
             <li id="btn-logout" style="display:none; list-style:none; align-items:center; gap:6px; flex-wrap:wrap;">
                 <span class="welcome-msg" id="welcome-msg"></span>
-                <button class="profile-btn" onclick="location.href='profile.html'">👤 My Profile</button>
-                <button class="logout-btn" onclick="logout()">Log Out</button>
+                <button class="profile-btn" onclick="location.href='profile.html'">👤 Mon profil</button>
+                <button class="logout-btn" onclick="logout()">Se déconnecter</button>
             </li>
             <div class="translate-wrap">
-                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Language</span> ▾</button>
+                <button class="translate-btn" onclick="toggleTranslate()">🌐 <span id="current-lang">Langue</span> ▾</button>
                 <div class="translate-dropdown" id="translate-dropdown">
                     <a onclick="setLang('en')">🇬🇧 English</a>
                     <a onclick="setLang('fr')">🇫🇷 Français</a>
@@ -139,194 +143,194 @@
 </nav>
 
 <div class="faq-hero">
-    <h1>❓ Frequently Asked Questions</h1>
-    <p>Everything you need to know about Oise au Jardin</p>
+    <h1>❓ Questions Fréquentes</h1>
+    <p>Tout ce que vous devez savoir sur Oise au Jardin</p>
 </div>
 
 <div class="faq-page">
 
-    <!-- GENERAL -->
+    <!-- GÉNÉRAL -->
     <div class="faq-section">
-        <h2>🌿 General</h2>
+        <h2>🌿 Général</h2>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                What is Oise au Jardin?
+                Qu'est-ce qu'Oise au Jardin ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Oise au Jardin is a free platform that connects young gardeners (teenagers looking for small jobs) with clients who need help in their garden. It was created by Thomas Legros, a 14-year-old from the Oise region of France. It's completely free for everyone — no fees, no subscriptions, ever.</p>
+                <p>Oise au Jardin est une plateforme gratuite qui met en relation de jeunes jardiniers (des ados cherchant de petits jobs) avec des clients ayant besoin d'aide dans leur jardin. Elle a été créée par Thomas Legros, un jeune de 14 ans de la région Oise. C'est entièrement gratuit pour tout le monde — sans frais, sans abonnement, jamais.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                Is it really free?
+                C'est vraiment gratuit ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Yes, 100% free. Creating an account, posting jobs, posting your availability as a gardener, messaging other users — all of it is completely free. We don't take any commission or charge any fees.</p>
+                <p>Oui, 100% gratuit. Créer un compte, publier des offres, publier sa disponibilité en tant que jardinier, envoyer des messages — tout est entièrement gratuit. Nous ne prenons aucune commission et ne facturons aucun frais.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                What area does the platform cover?
+                Quelle zone géographique couvre la plateforme ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>The platform is mainly focused on the Oise region in France (cities like Compiègne, Senlis, Creil, Beauvais, etc.), but anyone from anywhere can sign up and use it.</p>
+                <p>La plateforme est principalement axée sur la région Oise en France (villes comme Compiègne, Senlis, Creil, Beauvais, etc.), mais tout le monde peut s'inscrire et l'utiliser, peu importe où il se trouve.</p>
             </div>
         </div>
     </div>
 
-    <!-- FOR CLIENTS -->
+    <!-- POUR LES CLIENTS -->
     <div class="faq-section">
-        <h2>🏡 For Clients</h2>
+        <h2>🏡 Pour les Clients</h2>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I find a gardener?
+                Comment trouver un jardinier ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Go to the <a href="gardeners.html">Gardeners page</a> and browse available young gardeners near you. You can filter by location, service type, price, and rating. Click "View Profile" on any card to see more details, then send them a message directly.</p>
+                <p>Rendez-vous sur la <a href="gardeners.html">page Jardiniers</a> et parcourez les jeunes jardiniers disponibles près de chez vous. Vous pouvez filtrer par localisation, type de service, prix et note. Cliquez sur « Voir le profil » pour en savoir plus, puis envoyez un message directement.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I post a job?
+                Comment publier une offre ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Create a free account (choose "Client" when signing up), then go to the <a href="jobs.html">Jobs page</a> and click "Post a Job". Fill in the location, what tasks you need done, your budget, and the date — and interested gardeners will be able to contact you.</p>
+                <p>Créez un compte gratuit (choisissez « Client » lors de l'inscription), puis rendez-vous sur la <a href="jobs.html">page Offres</a> et cliquez sur « Publier une Offre ». Renseignez la localisation, les tâches à effectuer, votre budget et la date — les jardiniers intéressés pourront vous contacter.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I pay the gardener?
+                Comment payer le jardinier ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Oise au Jardin is only a platform to connect people — we don't handle any payments. You arrange payment directly with the gardener (cash, bank transfer, etc.) after agreeing on the job details in the chat.</p>
+                <p>Oise au Jardin est uniquement une plateforme de mise en relation — nous ne gérons aucun paiement. Vous organisez le paiement directement avec le jardinier (espèces, virement, etc.) après avoir convenu des détails de la mission dans le chat.</p>
             </div>
         </div>
     </div>
 
-    <!-- FOR GARDENERS -->
+    <!-- POUR LES JARDINIERS -->
     <div class="faq-section">
-        <h2>🌱 For Gardeners</h2>
+        <h2>🌱 Pour les Jardiniers</h2>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I sign up as a gardener?
+                Comment m'inscrire en tant que jardinier ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Click "Sign Up" at the top of the page and choose "Young Gardener" as your role. Then go to the <a href="gardeners.html">Gardeners page</a> and click "Post Your Availability" to create your gardener profile with your location, services, and hourly price.</p>
+                <p>Cliquez sur « S'inscrire » en haut de la page et choisissez « Jeune Jardinier » comme rôle. Ensuite, rendez-vous sur la <a href="gardeners.html">page Jardiniers</a> et cliquez sur « Publier ma Disponibilité » pour créer votre profil avec votre localisation, vos services et votre tarif horaire.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                What services can I offer?
+                Quels services puis-je proposer ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Any gardening work you're comfortable with — lawn mowing, weeding, hedge trimming, pruning, planting, leaf collection, watering, or general tidying. You can list whatever you offer when you create your availability post.</p>
+                <p>Tous les travaux de jardinage que vous maîtrisez — tonte de pelouse, désherbage, taille de haie, élagage, plantation, ramassage de feuilles, arrosage ou nettoyage général. Vous indiquez vos services lors de la création de votre profil.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How much should I charge?
+                Quel tarif pratiquer ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>That's entirely up to you. A typical rate for a young gardener in France is around €8–€15 per hour, depending on the task and your experience. You set your own price when you post your profile.</p>
+                <p>C'est entièrement à vous de décider. Un tarif typique pour un jeune jardinier en France se situe autour de 8 à 15 € de l'heure, selon la tâche et votre expérience. Vous fixez votre propre prix lors de la publication de votre profil.</p>
             </div>
         </div>
     </div>
 
-    <!-- SAFETY -->
+    <!-- SÉCURITÉ -->
     <div class="faq-section">
-        <h2>🔒 Safety</h2>
+        <h2>🔒 Sécurité</h2>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                Is it safe to meet someone from the platform?
+                Est-il sûr de rencontrer quelqu'un via la plateforme ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>We recommend always telling a parent or guardian before meeting someone for a gardening job. For your first job with a new client, it's a good idea to bring a friend or have a parent nearby. Always trust your instincts — if something feels off, it's okay to say no.</p>
+                <p>Nous recommandons de toujours prévenir un parent ou tuteur avant de rencontrer quelqu'un pour un job de jardinage. Pour votre première mission avec un nouveau client, c'est une bonne idée de venir accompagné ou d'avoir un parent à proximité. Faites toujours confiance à votre instinct — il est normal de dire non si quelque chose vous semble bizarre.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                What if someone is rude or inappropriate?
+                Que faire si quelqu'un est irrespectueux ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Please report it immediately by emailing us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. We take safety seriously and will review and remove any users who break our rules. You can also just block and ignore any user who makes you uncomfortable.</p>
+                <p>Signalez-le immédiatement par e-mail à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a>. Nous prenons la sécurité très au sérieux et nous examinerons et supprimerons tout utilisateur ne respectant pas nos règles. Vous pouvez également ignorer ou bloquer tout utilisateur qui vous met mal à l'aise.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                Is my personal data safe?
+                Mes données personnelles sont-elles protégées ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Yes. Your data is stored securely on Google Firebase, which follows strict EU data protection rules (GDPR). Your login email is never shown publicly. Read our full <a href="legal.html">Privacy Policy</a> for all the details.</p>
+                <p>Oui. Vos données sont stockées de manière sécurisée sur Google Firebase, qui respecte les règles strictes de protection des données de l'UE (RGPD). Votre e-mail de connexion n'est jamais affiché publiquement. Consultez notre <a href="legal.html">Politique de confidentialité</a> pour tous les détails.</p>
             </div>
         </div>
     </div>
 
-    <!-- ACCOUNT -->
+    <!-- MON COMPTE -->
     <div class="faq-section">
-        <h2>👤 My Account</h2>
+        <h2>👤 Mon Compte</h2>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I edit my profile?
+                Comment modifier mon profil ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Log in and click "My Profile" in the navigation bar. From there you can update your location, bio, contact email, and profile picture.</p>
+                <p>Connectez-vous et cliquez sur « Mon profil » dans la barre de navigation. Vous pouvez y mettre à jour votre localisation, votre bio, votre e-mail de contact et votre photo de profil.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                How do I delete my account?
+                Comment supprimer mon compte ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Email us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> and we'll delete your account and all your data within 30 days. This is your right under GDPR.</p>
+                <p>Envoyez-nous un e-mail à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> et nous supprimerons votre compte et toutes vos données dans les 30 jours. C'est votre droit en vertu du RGPD.</p>
             </div>
         </div>
 
         <div class="faq-item">
             <button class="faq-question" onclick="toggle(this)">
-                I forgot my password. What do I do?
+                J'ai oublié mon mot de passe. Que faire ?
                 <span class="arrow">▼</span>
             </button>
             <div class="faq-answer">
-                <p>Contact us at <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> and we'll help you reset it. We're working on adding a self-service password reset feature soon.</p>
+                <p>Contactez-nous à <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a> et nous vous aiderons à le réinitialiser. Nous travaillons à l'ajout d'une fonctionnalité de réinitialisation automatique prochainement.</p>
             </div>
         </div>
     </div>
 
     <!-- CTA -->
     <div class="faq-cta">
-        <h2>Still have a question?</h2>
-        <p>We're happy to help — just send us a message.</p>
+        <h2>Une autre question ?</h2>
+        <p>Nous sommes là pour vous aider — envoyez-nous un message.</p>
         <div class="faq-cta-btns">
-            <a href="index.html#contact" class="btn-primary">✉️ Contact Us</a>
-            <a href="gardeners.html" class="btn-outline">🌱 Find a Gardener</a>
+            <a href="index.html#contact" class="btn-primary">✉️ Nous Contacter</a>
+            <a href="gardeners.html" class="btn-outline">🌱 Trouver un Jardinier</a>
         </div>
     </div>
 
@@ -334,9 +338,9 @@
 
 <footer class="footer">
     <div class="container">
-        <p>🌿 <strong>Oise au Jardin</strong> — Free gardening platform for young people</p>
-        <p>Contact: <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a></p>
-        <p style="margin-top:12px;"><a href="legal.html">Terms of Service</a> &nbsp;·&nbsp; <a href="legal.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a></p>
+        <p>🌿 <strong>Oise au Jardin</strong> — Plateforme de jardinage gratuite pour les jeunes</p>
+        <p>Contact : <a href="mailto:ciril8596@gmail.com">ciril8596@gmail.com</a></p>
+        <p style="margin-top:12px;"><a href="legal.html">Mentions légales</a> &nbsp;·&nbsp; <a href="legal.html">Politique de confidentialité</a> &nbsp;·&nbsp; <a href="faq.html">FAQ</a></p>
         <p style="margin-top:8px;font-size:12px;opacity:0.5;">© 2026 Oise au Jardin</p>
     </div>
 </footer>
@@ -367,7 +371,7 @@
             document.getElementById('btn-login').style.display = 'none';
             document.getElementById('btn-signup').style.display = 'none';
             document.getElementById('btn-logout').style.display = 'flex';
-            document.getElementById('welcome-msg').textContent = 'Hi, ' + (data.name || '') + '!';
+            document.getElementById('welcome-msg').textContent = 'Bonjour, ' + (data.name || '') + ' !';
             updateBadge(user.uid);
         } else {
             document.getElementById('btn-login').style.display = 'inline';
@@ -403,5 +407,6 @@
 <div style="display:none;" id="google_translate_element"></div>
 <script>function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:'en,fr,es,de,it,nl',autoDisplay:false},'google_translate_element');}</script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="js/ai-assistant.js"></script>
 </body>
 </html>
