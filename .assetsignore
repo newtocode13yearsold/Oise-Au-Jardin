@@ -1,0 +1,15 @@
+.git/**
+.claude/**
+.wrangler/**
+node_modules/**
+src/**
+firebase.json
+firestore.rules
+wrangler.jsonc
+package.json
+package-lock.json
+vite.config.js
+LICENSE
+README.md
+.gitignore
+.assetsignore
