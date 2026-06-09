@@ -125,16 +125,27 @@
 </body>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     const firebaseConfig = { apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI", authDomain:"oise-au-jardin.firebaseapp.com", projectId:"oise-au-jardin", storageBucket:"oise-au-jardin.firebasestorage.app", messagingSenderId:"895167286481", appId:"1:895167286481:web:6c4853a9c793c3aed149f0" };
-    const auth = getAuth(initializeApp(firebaseConfig));
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
     document.getElementById('login-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const btn = document.getElementById('login-btn');
         const err = document.getElementById('login-error');
         btn.disabled = true; btn.textContent = 'Connexion en cours...';
         try {
-            await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+            const cred = await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+            const banned = await getDoc(doc(db, "banned_users", cred.user.uid));
+            if (banned.exists()) {
+                await signOut(auth);
+                err.textContent = 'Ce compte a été supprimé par un administrateur.';
+                err.style.display = 'block';
+                btn.disabled = false; btn.textContent = 'Se connecter';
+                return;
+            }
             window.location.href = '../profile.html';
         } catch {
             err.textContent = 'E-mail ou mot de passe incorrect.';

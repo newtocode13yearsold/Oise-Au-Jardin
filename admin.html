@@ -398,6 +398,7 @@
         window.deleteUser = async function(userId, name) {
             if (!confirm(`Delete account of ${name}? This cannot be undone.`)) return;
             await deleteDoc(doc(db, "users", userId));
+            await setDoc(doc(db, "banned_users", userId), { bannedAt: new Date().toISOString() });
             loadUsers();
             loadStats();
         }
