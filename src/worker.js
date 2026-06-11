@@ -51,28 +51,18 @@ async function handleAiChat(request, env) {
         }))
       : [];
 
-    const messages = [...safeHistory, { role: 'user', content: trimmed }];
-
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json'
+    const messages = [
+      {
+        role: 'system',
+        content: `Tu es Jardinot 🌱, l'assistant jardinier IA d'Oise au Jardin — une plateforme qui connecte des propriétaires avec de jeunes jardiniers dans l'Oise (Picardie), France. Tu donnes des conseils de jardinage pratiques, adaptés au climat de la région. Tu es sympathique, enthousiaste, et concis (2-4 phrases). Réponds dans la langue de l'utilisateur. Parle uniquement de jardinage, plantes, entretien de jardins, et de la plateforme Oise au Jardin.`
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        system: `Tu es Jardinot 🌱, l'assistant jardinier IA d'Oise au Jardin — une plateforme qui connecte des propriétaires avec de jeunes jardiniers dans l'Oise (Picardie), France. Tu donnes des conseils de jardinage pratiques, adaptés au climat de la région. Tu es sympathique, enthousiaste, et concis (2-4 phrases). Réponds dans la langue de l'utilisateur. Parle uniquement de jardinage, plantes, entretien de jardins, et de la plateforme Oise au Jardin.`
-      ,
-        messages
-      })
-    });
+      ...safeHistory,
+      { role: 'user', content: trimmed }
+    ];
 
-    if (!res.ok) throw new Error(`Anthropic ${res.status}`);
+    const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', { messages });
 
-    const data = await res.json();
-    const reply = data.content?.[0]?.text ?? "Je n'ai pas pu répondre. Réessaie !";
+    const reply = result?.response ?? "Je n'ai pas pu répondre. Réessaie !";
 
     return jsonResponse({ reply });
   } catch (e) {
