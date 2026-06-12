@@ -120,7 +120,16 @@
             <input type="date" id="j-date" required>
             <input type="number" id="j-budget" placeholder="Budget (€)" required min="1">
             <textarea id="j-description" placeholder="Décrivez vos besoins en détail..." rows="3" required></textarea>
-            <button type="submit" class="btn">Publier l'offre</button>
+
+            <label style="font-size:13px;color:#666;font-weight:600;display:block;margin-bottom:8px;">📷 Photo de votre jardin (facultatif)</label>
+            <div id="j-photo-preview" style="display:none;margin-bottom:10px;"><img id="j-photo-img" src="" alt="Aperçu" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid #e2e8f0;"></div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:10px;padding:12px 16px;font-size:13px;color:#64748b;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#2c5f2e'" onmouseout="this.style.borderColor='#94a3b8'">
+                <span style="font-size:22px;">🌿</span>
+                <span id="j-photo-label">Ajouter une photo de votre jardin ou pelouse</span>
+                <input type="file" id="j-photo-input" accept="image/*" style="display:none;" onchange="handleJobPhoto(event)">
+            </label>
+
+            <button type="submit" class="btn" style="margin-top:16px;">Publier l'offre</button>
         </form>
     </div>
 </div>
@@ -149,10 +158,11 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, orderBy, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, orderBy, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
     const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
-    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);
-    let currentUser=null,currentRole=null,currentProfileUserId=null,allJobs=[],selectedTasks=[];
+    const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);const storage=getStorage(app);
+    let currentUser=null,currentRole=null,currentProfileUserId=null,allJobs=[],selectedTasks=[],pendingJobPhoto=null;
 
     async function updateBadge(uid){
         const q=query(collection(db,"chats"),where("participants","array-contains",uid));
@@ -216,21 +226,27 @@
         res.textContent=jobs.length===allJobs.length?'':`${jobs.length} résultat${jobs.length!==1?'s':''} trouvé${jobs.length!==1?'s':''}`;
         jobs.forEach(d=>{
             const isOwner=currentUser&&currentUser.uid===d.postedBy;
+            const filled=d.status==='filled';
             const tasks=Array.isArray(d.tasks)?d.tasks:[d.jobType||''];
             const tasksHTML=tasks.filter(Boolean).map(t=>`<span style="display:inline-block;background:#e8f5e9;color:#2c5f2e;padding:2px 10px;border-radius:12px;font-size:12px;margin:2px;font-weight:500;">${t}</span>`).join('');
             const el=document.createElement('div');el.className='card';
+            if(filled)el.style.opacity='0.72';
             el.innerHTML=`
+                ${filled?`<div style="background:#e8f5e9;color:#2c5f2e;font-weight:700;font-size:13px;text-align:center;padding:7px;border-radius:8px;margin-bottom:12px;">✅ Offre pourvue</div>`:''}
                 <div class="card-header">
                     <img class="card-pic" src="${d.pic}" alt="${d.posterName}">
                     <div><h3>${d.posterName}</h3><p class="location">📍 ${d.location}</p></div>
                 </div>
+                ${d.jobPhotoURL?`<img src="${d.jobPhotoURL}" alt="Photo du jardin" style="width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:10px;border:1px solid #e2e8f0;">`:''}
                 <div style="margin-bottom:8px;line-height:1.8;">${tasksHTML}</div>
                 ${d.landSize?`<p style="font-size:13px;color:#555;margin-bottom:6px;">🏞 ${d.landSize}</p>`:''}
                 <p class="budget">Budget : €${d.budget}</p>
                 <p class="date">📅 Date souhaitée : ${d.date}</p>
                 <p class="description">${d.description}</p>
+                ${currentUser&&!isOwner&&!filled?`<button onclick="contactToBook('${d.postedBy}')" style="width:100%;padding:10px;margin-bottom:10px;background:#2c5f2e;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">💬 Contacter pour réserver</button>`:''}
                 <div class="card-actions">
                     <button class="view-profile-btn" onclick="viewProfile('${d.postedBy}')">👤 Voir le profil</button>
+                    ${isOwner?`<button onclick="toggleJobStatus('${d.id}',${filled})" style="padding:8px 14px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:${filled?'#fff3e0':'#e8f5e9'};color:${filled?'#b45309':'#2c5f2e'};">${filled?'↩️ Rouvrir l’offre':'✅ Marquer comme pourvue'}</button>`:''}
                     ${isOwner?`<button class="delete-card-btn" onclick="deletePost('${d.id}')">🗑 Supprimer</button>`:''}
                 </div>
                 <div class="comments-section">
@@ -293,13 +309,26 @@
     }
     window.closeProfilePopup=function(){document.getElementById('profilePopup').classList.remove('active');}
     window.goToChat=function(){if(!currentUser){location.href='index.html';return;}location.href=`chat.html?with=${currentProfileUserId}`;}
+    window.handleJobPhoto=function(e){
+        const file=e.target.files[0];if(!file)return;
+        pendingJobPhoto=file;
+        const label=document.getElementById('j-photo-label');
+        label.textContent=file.name;
+        const r=new FileReader();
+        r.onload=ev=>{document.getElementById('j-photo-img').src=ev.target.result;document.getElementById('j-photo-preview').style.display='block';};
+        r.readAsDataURL(file);
+    }
     window.openPostModal=function(){
         if(!currentUser){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='Vous devez être connecté pour publier.';return;}
         if(currentRole!=='client'){document.getElementById('login-warning').style.display='block';document.getElementById('login-warning').textContent='Seuls les clients peuvent publier des offres.';return;}
         document.getElementById('login-warning').style.display='none';
-        selectedTasks=[];
+        selectedTasks=[];pendingJobPhoto=null;
         document.querySelectorAll('.task-chip').forEach(c=>c.classList.remove('selected'));
         document.getElementById('land-size-group').classList.remove('show');
+        document.getElementById('j-photo-preview').style.display='none';
+        document.getElementById('j-photo-img').src='';
+        document.getElementById('j-photo-label').textContent='Ajouter une photo de votre jardin ou pelouse';
+        document.getElementById('j-photo-input').value='';
         document.getElementById('postModal').classList.add('active');
     }
     window.closePostModal=function(){document.getElementById('postModal').classList.remove('active');}
@@ -310,7 +339,13 @@
         const btn=e.target.querySelector('button[type="submit"]');
         btn.disabled=true;btn.textContent='Publication en cours...';
         try{
-            await addDoc(collection(db,"jobs"),{location:document.getElementById('j-location').value,tasks:selectedTasks,jobType:selectedTasks[0],landSize:document.getElementById('j-land-size').value||null,date:document.getElementById('j-date').value,budget:document.getElementById('j-budget').value,description:document.getElementById('j-description').value,postedBy:currentUser.uid,createdAt:new Date()});
+            let jobPhotoURL=null;
+            if(pendingJobPhoto){
+                const sr=ref(storage,`job-photos/${currentUser.uid}/${Date.now()}`);
+                await uploadBytes(sr,pendingJobPhoto);
+                jobPhotoURL=await getDownloadURL(sr);
+            }
+            await addDoc(collection(db,"jobs"),{location:document.getElementById('j-location').value,tasks:selectedTasks,jobType:selectedTasks[0],landSize:document.getElementById('j-land-size').value||null,date:document.getElementById('j-date').value,budget:document.getElementById('j-budget').value,description:document.getElementById('j-description').value,jobPhotoURL,postedBy:currentUser.uid,createdAt:new Date()});
             closePostModal();loadJobs();
         }catch(err){
             console.error('submitJob error:',err);
@@ -318,6 +353,15 @@
         }finally{
             btn.disabled=false;btn.textContent='Publier l\'offre';
         }
+    }
+    window.toggleJobStatus=async function(id,filled){
+        try{await updateDoc(doc(db,"jobs",id),{status:filled?'open':'filled'});loadJobs();}
+        catch(err){console.error('toggleJobStatus error:',err);alert('Impossible de mettre à jour l\'offre.');}
+    }
+    window.contactToBook=function(uid){
+        if(!currentUser){location.href='index.html';return;}
+        if(currentUser.uid===uid)return;
+        location.href=`chat.html?with=${uid}`;
     }
     window.logout=async function(){await signOut(auth);location.href='index.html';}
 </script>

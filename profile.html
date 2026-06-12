@@ -90,6 +90,16 @@
         <p class="success-msg" id="success-msg">✅ Profil enregistré !</p>
     </div>
 
+    <div class="my-posts-section" id="portfolio-section" style="display:none;">
+        <h2>📸 Mes Réalisations</h2>
+        <p style="color:#64748b;font-size:14px;margin:-6px 0 16px;">Ajoutez des photos de vos jardins et de votre travail pour inspirer confiance aux clients (6 photos maximum).</p>
+        <div id="portfolio-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px;"></div>
+        <label id="portfolio-add" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:10px;padding:12px 18px;font-size:14px;color:#64748b;font-weight:600;">
+            <span style="font-size:20px;">➕</span> <span id="portfolio-add-label">Ajouter une photo</span>
+            <input type="file" id="portfolio-input" accept="image/*" style="display:none;" onchange="handlePortfolioAdd(event)">
+        </label>
+    </div>
+
     <div class="my-posts-section" id="my-posts-section" style="display:none;">
         <h2>📋 Mes Publications</h2>
         <div id="my-posts-list"></div>
@@ -111,7 +121,7 @@
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
     const firebaseConfig={apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",authDomain:"oise-au-jardin.firebaseapp.com",projectId:"oise-au-jardin",storageBucket:"oise-au-jardin.firebasestorage.app",messagingSenderId:"895167286481",appId:"1:895167286481:web:6c4853a9c793c3aed149f0"};
     const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);const storage=getStorage(app);
-    let currentUser=null,pendingPhotoFile=null;
+    let currentUser=null,pendingPhotoFile=null,currentPortfolio=[];
 
     async function updateBadge(uid){
         const q=query(collection(db,"chats"),where("participants","array-contains",uid));
@@ -143,6 +153,9 @@
                 document.getElementById('field-contact').value=data.contactEmail||data.email||'';
                 document.getElementById('field-bio').value=data.bio||'';
                 document.getElementById('profile-pic').src=data.photoURL||`https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2c5f2e&color=fff&size=110`;
+                currentPortfolio=Array.isArray(data.portfolio)?data.portfolio:[];
+                togglePortfolioSection(data.role);
+                renderPortfolio();
                 if(user.email==='ciril8596@gmail.com')document.getElementById('admin-nav-btn').style.display='inline';
             }
             updateBadge(user.uid);
@@ -173,10 +186,50 @@
         const updates={name:newName,role:document.getElementById('field-role').value,location:document.getElementById('field-location').value,contactEmail:document.getElementById('field-contact').value,bio:document.getElementById('field-bio').value};
         document.getElementById('display-name').textContent=newName;
         document.getElementById('display-role').textContent=updates.role==='gardener'?'🌱 Jeune Jardinier':'🏡 Client';
+        togglePortfolioSection(updates.role);
         document.getElementById('welcome-msg').textContent='Bonjour, '+newName+' !';
         if(photoURL)updates.photoURL=photoURL;
         await updateDoc(doc(db,"users",currentUser.uid),updates);
         const s=document.getElementById('success-msg');s.style.display='block';setTimeout(()=>s.style.display='none',3000);pendingPhotoFile=null;
+    }
+    function togglePortfolioSection(role){
+        document.getElementById('portfolio-section').style.display=role==='gardener'?'block':'none';
+    }
+    function renderPortfolio(){
+        const grid=document.getElementById('portfolio-grid');
+        grid.innerHTML='';
+        if(currentPortfolio.length===0){grid.innerHTML='<p style="color:#bbb;font-size:13px;grid-column:1/-1;">Aucune photo pour l\'instant. Ajoutez votre première réalisation !</p>';}
+        else{
+            currentPortfolio.forEach((url,i)=>{
+                grid.innerHTML+=`<div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;">
+                    <img src="${url}" alt="Réalisation" style="width:100%;height:100%;object-fit:cover;">
+                    <button onclick="removePortfolio(${i})" title="Supprimer" style="position:absolute;top:5px;right:5px;width:26px;height:26px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:14px;cursor:pointer;line-height:1;">✕</button>
+                </div>`;
+            });
+        }
+        const add=document.getElementById('portfolio-add');
+        add.style.display=currentPortfolio.length>=6?'none':'inline-flex';
+    }
+    window.handlePortfolioAdd=async function(e){
+        const file=e.target.files[0];if(!file||!currentUser)return;
+        if(currentPortfolio.length>=6){alert('Vous avez atteint le maximum de 6 photos.');return;}
+        const label=document.getElementById('portfolio-add-label');
+        label.textContent='Envoi en cours...';
+        try{
+            const sr=ref(storage,`portfolio/${currentUser.uid}/${Date.now()}`);
+            await uploadBytes(sr,file);
+            const url=await getDownloadURL(sr);
+            currentPortfolio.push(url);
+            await updateDoc(doc(db,"users",currentUser.uid),{portfolio:currentPortfolio});
+            renderPortfolio();
+        }catch(err){console.error('Portfolio upload failed:',err);alert('Impossible d\'ajouter la photo. Réessayez.');}
+        finally{label.textContent='Ajouter une photo';document.getElementById('portfolio-input').value='';}
+    }
+    window.removePortfolio=async function(i){
+        if(!currentUser||!confirm('Supprimer cette photo ?'))return;
+        currentPortfolio.splice(i,1);
+        await updateDoc(doc(db,"users",currentUser.uid),{portfolio:currentPortfolio});
+        renderPortfolio();
     }
     window.logout=async function(){await signOut(auth);location.href='index.html';}
 </script>

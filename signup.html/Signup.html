@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#2c5f2e">
     <link rel="apple-touch-icon" href="../images/logo.png">
     <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init('wynn54CLuZBOltXKg');</script>
     <style>
         body {
             min-height: 100vh;
@@ -126,25 +128,31 @@
                 <option value="client">Client (cherche de l'aide)</option>
             </select>
 
-            <label style="font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:5px;text-align:left;">Année de naissance</label>
-            <select id="signup-birthyear" required style="color:#333;">
-                <option value="" disabled selected>Sélectionnez votre année de naissance</option>
-            </select>
-
-            <div id="parental-consent-box" style="display:none;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:14px;margin-bottom:15px;text-align:left;">
-                <p style="font-size:13px;color:#7a5c00;margin:0 0 10px 0;">⚠️ Vous avez moins de 16 ans. La loi française exige l'autorisation d'un parent ou tuteur pour utiliser cette plateforme.</p>
-                <label style="font-size:13px;color:#555;display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
-                    <input type="checkbox" id="parental-consent" style="width:auto;margin-top:2px;">
-                    <span>Mon parent ou tuteur a lu les <a href="../legal.html" target="_blank">Conditions d'utilisation</a> et m'autorise à utiliser Oise au Jardin.</span>
-                </label>
+            <label style="font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:8px;text-align:left;">Date de naissance</label>
+            <div style="display:flex;gap:10px;margin-bottom:15px;">
+                <input type="number" id="signup-birthday" placeholder="Jour" min="1" max="31" style="width:33%;padding:12px 10px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
+                <input type="number" id="signup-birthmonth" placeholder="Mois" min="1" max="12" style="width:33%;padding:12px 10px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
+                <input type="number" id="signup-birthyear" placeholder="Année" min="1940" max="2015" style="width:34%;padding:12px 10px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
             </div>
-
-            <div style="background:#f0f7f0;border-left:4px solid #2c5f2e;border-radius:6px;padding:12px 14px;margin-bottom:15px;text-align:left;">
-                <p style="font-size:12px;color:#2c5f2e;margin:0;">💶 <strong>Déclaration de revenus :</strong> Tout argent gagné via cette plateforme peut devoir être déclaré aux impôts français. Vous en êtes personnellement responsable. Oise au Jardin ne gère aucun paiement.</p>
-            </div>
-
             <p id="signup-error" style="color:#c0392b;font-size:14px;display:none;margin-bottom:10px;"></p>
-            <button type="submit" class="btn" id="signup-btn">Créer mon compte</button>
+            <button type="button" id="validate-age-btn" class="btn" onclick="validateAge()">Valider mon âge →</button>
+
+            <div id="step2" style="display:none;margin-top:15px;">
+                <div id="parental-consent-box" style="display:none;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:14px;margin-bottom:15px;text-align:left;">
+                    <p style="font-size:13px;color:#7a5c00;margin:0 0 10px 0;">⚠️ Vous avez moins de 16 ans. Nous avons besoin de l'e-mail d'un parent ou tuteur.</p>
+                    <input type="email" id="signup-parent-email" placeholder="E-mail de votre parent/tuteur" style="width:100%;padding:12px;border:1px solid #f0c040;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:10px;">
+                    <label style="font-size:13px;color:#555;display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+                        <input type="checkbox" id="parental-consent" style="width:auto;margin-top:2px;">
+                        <span>Mon parent ou tuteur a lu les <a href="../legal.html" target="_blank">Conditions d'utilisation</a> et m'autorise à utiliser Oise au Jardin.</span>
+                    </label>
+                </div>
+
+                <div style="background:#f0f7f0;border-left:4px solid #2c5f2e;border-radius:6px;padding:12px 14px;margin-bottom:15px;text-align:left;">
+                    <p style="font-size:12px;color:#2c5f2e;margin:0;">💶 <strong>Déclaration de revenus :</strong> Tout argent gagné via cette plateforme peut devoir être déclaré aux impôts français. Vous en êtes personnellement responsable. Oise au Jardin ne gère aucun paiement.</p>
+                </div>
+
+                <button type="submit" class="btn" id="signup-btn">Créer mon compte</button>
+            </div>
         </form>
 
         <p>Déjà inscrit ? <a href="../login.html/Login.html">Se connecter</a></p>
@@ -154,38 +162,40 @@
 
 </body>
 <script>
-    // Populate birth year dropdown (current year down to 1940)
-    const bySelect = document.getElementById('signup-birthyear');
-    const currentYear = new Date().getFullYear();
-    for (let y = currentYear; y >= 1940; y--) {
-        const opt = document.createElement('option');
-        opt.value = y; opt.textContent = y;
-        bySelect.appendChild(opt);
-    }
-    bySelect.addEventListener('change', function() {
-        const age = currentYear - parseInt(this.value);
-        const box = document.getElementById('parental-consent-box');
-        const checkbox = document.getElementById('parental-consent');
-        if (age < 14) {
-            document.getElementById('signup-error').textContent = 'Vous devez avoir au moins 14 ans pour utiliser cette plateforme.';
-            document.getElementById('signup-error').style.display = 'block';
-            box.style.display = 'none';
-            checkbox.required = false;
-        } else if (age < 16) {
-            document.getElementById('signup-error').style.display = 'none';
-            box.style.display = 'block';
-            checkbox.required = true;
-        } else {
-            document.getElementById('signup-error').style.display = 'none';
-            box.style.display = 'none';
-            checkbox.required = false;
+    function validateAge() {
+        const year = parseInt(document.getElementById('signup-birthyear').value);
+        const month = parseInt(document.getElementById('signup-birthmonth').value);
+        const day = parseInt(document.getElementById('signup-birthday').value);
+        const err = document.getElementById('signup-error');
+        if (!year || !month || !day) { err.style.display='block'; err.textContent='Veuillez entrer votre date de naissance complète.'; return; }
+        const today = new Date();
+        const birth = new Date(year, month - 1, day);
+        if (birth > today) { err.style.display='block'; err.textContent='Date de naissance invalide.'; return; }
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        if (age < 14) { err.style.display='block'; err.textContent='Vous devez avoir au moins 14 ans pour utiliser cette plateforme.'; return; }
+        ['signup-birthday','signup-birthmonth','signup-birthyear'].forEach(id => {
+            const el = document.getElementById(id);
+            el.readOnly = true;
+            el.style.background = '#f0f0f0';
+            el.style.color = '#888';
+            el.removeAttribute('required');
+        });
+        document.getElementById('validate-age-btn').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        if (age < 16) {
+            document.getElementById('parental-consent-box').style.display = 'block';
+            document.getElementById('signup-parent-email').required = true;
+            document.getElementById('parental-consent').required = true;
         }
-    });
+        err.style.display = 'none';
+    }
 </script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     const firebaseConfig = { apiKey:"AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI", authDomain:"oise-au-jardin.firebaseapp.com", projectId:"oise-au-jardin", storageBucket:"oise-au-jardin.firebasestorage.app", messagingSenderId:"895167286481", appId:"1:895167286481:web:6c4853a9c793c3aed149f0" };
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -195,14 +205,20 @@
         const btn = document.getElementById('signup-btn');
         const err = document.getElementById('signup-error');
         const birthYear = parseInt(document.getElementById('signup-birthyear').value);
-        const age = new Date().getFullYear() - birthYear;
-        if (!birthYear || age < 14) {
-            err.textContent = 'Vous devez avoir au moins 14 ans pour utiliser cette plateforme.';
-            err.style.display = 'block'; return;
-        }
-        if (age < 16 && !document.getElementById('parental-consent').checked) {
-            err.textContent = 'L\'autorisation parentale est requise pour les utilisateurs de moins de 16 ans.';
-            err.style.display = 'block'; return;
+        const birthMonth = parseInt(document.getElementById('signup-birthmonth').value);
+        const birthDay = parseInt(document.getElementById('signup-birthday').value);
+        const today = new Date();
+        const birth = new Date(birthYear, birthMonth - 1, birthDay);
+        let age = today.getFullYear() - birth.getFullYear();
+        const mo = today.getMonth() - birth.getMonth();
+        if (mo < 0 || (mo === 0 && today.getDate() < birth.getDate())) age--;
+        let parentEmail = null;
+        if (age < 16) {
+            parentEmail = document.getElementById('signup-parent-email').value.trim().toLowerCase();
+            if (!document.getElementById('parental-consent').checked) { err.textContent = "L'autorisation parentale est requise."; err.style.display = 'block'; return; }
+            if (!parentEmail) { err.textContent = "Veuillez entrer l'e-mail d'un parent ou tuteur."; err.style.display = 'block'; return; }
+            const snap = await getDocs(query(collection(db, "users"), where("parentEmail", "==", parentEmail)));
+            if (!snap.empty) { err.textContent = "Cette adresse e-mail parentale est déjà associée à un compte."; err.style.display = 'block'; return; }
         }
         const name = document.getElementById('signup-name').value.trim();
         const email = document.getElementById('signup-email').value.trim();
@@ -212,7 +228,16 @@
         btn.disabled = true; btn.textContent = 'Création du compte...';
         try {
             const uc = await createUserWithEmailAndPassword(auth, email, password);
-            await setDoc(doc(db, "users", uc.user.uid), { name, email, role, birthYear, parentalConsent: age < 16, location: '', bio: '', contactEmail: email, photoURL: '' });
+            await setDoc(doc(db, "users", uc.user.uid), { name, email, role, birthYear, parentEmail: parentEmail || '', parentalConsent: age < 16, location: '', bio: '', contactEmail: email, photoURL: '' });
+            if (parentEmail) {
+                await emailjs.send('service_wbf7cqn', 'template_weqpn2m', {
+                    parent_email: parentEmail,
+                    name: name,
+                    email: email,
+                    title: 'Inscription Oise au Jardin',
+                    message: name + ' (' + email + ') vient de créer un compte sur Oise au Jardin avec votre adresse e-mail comme contact parental. Si vous n\'avez pas autorisé cette inscription, contactez-nous à ciril8596@gmail.com.',
+                });
+            }
             window.location.href = '../profile.html';
         } catch(e) {
             err.textContent = e.code === 'auth/email-already-in-use' ? 'Un compte avec cet e-mail existe déjà.' : e.code === 'auth/weak-password' ? 'Le mot de passe doit contenir au moins 8 caractères.' : 'Une erreur est survenue. Veuillez réessayer.';

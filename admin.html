@@ -185,7 +185,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, addDoc, orderBy, query, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, addDoc, orderBy, query, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD2MMsLW-Lm56SCVOECyX80OWQMmZ9qKbI",
@@ -396,11 +396,32 @@
         }
 
         window.deleteUser = async function(userId, name) {
-            if (!confirm(`Delete account of ${name}? This cannot be undone.`)) return;
+            if (!confirm(`Delete account of ${name}? This will remove their account, posts, and conversations. This cannot be undone.`)) return;
+
+            // Delete their gardener post if they have one
+            const gardenerSnap = await getDocs(query(collection(db, "gardeners"), where("userId", "==", userId)));
+            for (const d of gardenerSnap.docs) await deleteDoc(doc(db, "gardeners", d.id));
+
+            // Delete their job posts
+            const jobsSnap = await getDocs(query(collection(db, "jobs"), where("postedBy", "==", userId)));
+            for (const d of jobsSnap.docs) await deleteDoc(doc(db, "jobs", d.id));
+
+            // Delete their chats and messages
+            const chatsSnap = await getDocs(collection(db, "chats"));
+            for (const chatDoc of chatsSnap.docs) {
+                const participants = chatDoc.data().participants || [];
+                if (participants.includes(userId)) {
+                    const msgsSnap = await getDocs(collection(db, "chats", chatDoc.id, "messages"));
+                    for (const m of msgsSnap.docs) await deleteDoc(doc(db, "chats", chatDoc.id, "messages", m.id));
+                    await deleteDoc(doc(db, "chats", chatDoc.id));
+                }
+            }
+
+            // Delete the user document and add to banned list
             await deleteDoc(doc(db, "users", userId));
             await setDoc(doc(db, "banned_users", userId), { bannedAt: new Date().toISOString() });
-            loadUsers();
-            loadStats();
+
+            loadAll();
         }
 
         window.deleteGardenerPost = async function(postId) {

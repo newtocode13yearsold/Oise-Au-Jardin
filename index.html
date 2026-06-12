@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#2c5f2e">
     <link rel="apple-touch-icon" href="images/logo.png">
     <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>emailjs.init('wynn54CLuZBOltXKg');</script>
     <style>
         .hero { background: linear-gradient(135deg, rgba(26,58,28,0.88), rgba(44,95,46,0.75)), url("./images/lawn.jpg"); background-size: cover; background-position: center; }
     </style>
@@ -84,7 +86,24 @@
                 <option value="gardener">🌱 Jeune Jardinier (cherche des missions)</option>
                 <option value="client">🏡 Client (cherche de l'aide)</option>
             </select>
-            <button type="submit" class="btn">Créer mon compte</button>
+            <label style="font-size:13px;font-weight:600;color:#555;display:block;margin-bottom:8px;text-align:left;">Date de naissance</label>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <input type="number" id="signup-birthday" placeholder="Jour" min="1" max="31" style="width:33%;padding:10px 8px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
+                <input type="number" id="signup-birthmonth" placeholder="Mois" min="1" max="12" style="width:33%;padding:10px 8px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
+                <input type="number" id="signup-birthyear" placeholder="Année" min="1940" max="2015" style="width:34%;padding:10px 8px;border:1px solid #ccc;border-radius:8px;font-size:15px;box-sizing:border-box;text-align:center;" required>
+            </div>
+            <button type="button" id="modal-validate-btn" class="btn" onclick="validateModalAge()">Valider mon âge →</button>
+            <div id="modal-step2" style="display:none;margin-top:12px;">
+                <div id="modal-parental-box" style="display:none;background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:12px;margin-bottom:12px;text-align:left;">
+                    <p style="font-size:13px;color:#7a5c00;margin:0 0 10px 0;">⚠️ Vous avez moins de 16 ans. Nous avons besoin de l'e-mail d'un parent ou tuteur.</p>
+                    <input type="email" id="signup-parent-email" placeholder="E-mail de votre parent/tuteur" style="width:100%;padding:10px;border:1px solid #f0c040;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:10px;">
+                    <label style="font-size:13px;color:#555;display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+                        <input type="checkbox" id="modal-parental-consent" style="width:auto;margin-top:2px;">
+                        <span>Mon parent ou tuteur m'autorise à utiliser Oise au Jardin.</span>
+                    </label>
+                </div>
+                <button type="submit" class="btn">Créer mon compte</button>
+            </div>
         </form>
         <p>Déjà inscrit ? <a onclick="switchModal('signup','login')">Se connecter</a></p>
     </div>
@@ -159,6 +178,18 @@
     </div>
 </section>
 
+<!-- TOP RATED GARDENERS -->
+<section id="featured" class="services" style="display:none;background:#fff;">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Les Mieux Notés</span>
+            <h2>⭐ Nos Jardiniers les Mieux Notés</h2>
+            <p class="section-subtitle">Les jeunes jardiniers les plus appréciés par nos clients</p>
+        </div>
+        <div class="service-grid" id="featured-grid"></div>
+    </div>
+</section>
+
 <!-- CONTACT -->
 <section id="contact" class="contact">
     <div class="container">
@@ -219,6 +250,37 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    async function loadTopGardeners() {
+        try {
+            const snap = await getDocs(collection(db,'gardeners'));
+            const arr = [];
+            for (const s of snap.docs) {
+                const data = s.data();
+                const r = await getDocs(collection(db,'gardeners',s.id,'ratings'));
+                if (r.empty) continue;
+                let t = 0; r.forEach(x => t += x.data().rating);
+                arr.push({ ...data, avg: t / r.size, count: r.size });
+            }
+            arr.sort((a,b) => b.avg - a.avg || b.count - a.count);
+            const top = arr.slice(0,3);
+            if (!top.length) return;
+            const grid = document.getElementById('featured-grid');
+            grid.innerHTML = top.map(g => {
+                const pic = g.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(g.name||'Jardinier') + '&background=2c5f2e&color=fff&size=80';
+                const f = Math.round(g.avg); let stars = '';
+                for (let i = 1; i <= 5; i++) stars += i <= f ? '★' : '☆';
+                return '<div class="service-card" style="cursor:pointer;" onclick="location.href=\'gardeners.html\'">' +
+                    '<img src="' + pic + '" alt="' + (g.name||'') + '" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 14px;display:block;border:3px solid #e8f5e9;">' +
+                    '<h3 style="text-align:center;">🌿 ' + (g.name||'Jardinier') + '</h3>' +
+                    '<p style="text-align:center;color:#f39c12;font-size:19px;margin:6px 0;">' + stars + ' <span style="color:#999;font-size:13px;">' + g.avg.toFixed(1) + ' (' + g.count + ')</span></p>' +
+                    '<p style="text-align:center;color:#64748b;font-size:13px;margin:2px 0;">📍 ' + (g.location||'') + '</p>' +
+                    '<p style="text-align:center;font-weight:700;color:#2c5f2e;">€' + (g.price||'?') + '/h</p>' +
+                '</div>';
+            }).join('');
+            document.getElementById('featured').style.display = 'block';
+        } catch(e) {}
+    }
+
     async function updateBadge(uid) {
         const q = query(collection(db,"chats"), where("participants","array-contains",uid));
         onSnapshot(q, async snap => {
@@ -243,6 +305,7 @@
             if (nf && data.name) nf.value = data.name;
             if (ef && data.email) ef.value = data.email;
             updateBadge(user.uid);
+            loadTopGardeners();
         } else {
             document.getElementById('btn-login').style.display = 'inline';
             document.getElementById('btn-signup').style.display = 'inline';
@@ -254,11 +317,38 @@
     window.handleSignup = async function(e) {
         e.preventDefault();
         const err = document.getElementById('signup-error');
+        const birthYear = parseInt(document.getElementById('signup-birthyear').value);
+        const birthMonth = parseInt(document.getElementById('signup-birthmonth').value);
+        const birthDay = parseInt(document.getElementById('signup-birthday').value);
+        const today = new Date();
+        const birth = new Date(birthYear, birthMonth - 1, birthDay);
+        let age = today.getFullYear() - birth.getFullYear();
+        const mo = today.getMonth() - birth.getMonth();
+        if (mo < 0 || (mo === 0 && today.getDate() < birth.getDate())) age--;
+        let parentEmail = null;
+        if (age < 16) {
+            parentEmail = document.getElementById('signup-parent-email').value.trim().toLowerCase();
+            if (!document.getElementById('modal-parental-consent').checked) { err.style.display='block'; err.textContent="L'autorisation parentale est requise."; return; }
+            if (!parentEmail) { err.style.display='block'; err.textContent="Veuillez entrer l'e-mail d'un parent ou tuteur."; return; }
+            const snap = await getDocs(query(collection(db,"users"), where("parentEmail","==",parentEmail)));
+            if (!snap.empty) { err.style.display='block'; err.textContent="Cette adresse e-mail parentale est déjà associée à un compte."; return; }
+        }
         try {
             const uc = await createUserWithEmailAndPassword(auth, document.getElementById('signup-email').value, document.getElementById('signup-password').value);
-            await setDoc(doc(db,"users",uc.user.uid), { name: document.getElementById('signup-name').value, email: document.getElementById('signup-email').value, role: document.getElementById('signup-role').value, location:'', bio:'', contactEmail: document.getElementById('signup-email').value, photoURL:'' });
+            await setDoc(doc(db,"users",uc.user.uid), { name: document.getElementById('signup-name').value.trim(), email: document.getElementById('signup-email').value.trim(), role: document.getElementById('signup-role').value, birthYear, parentEmail: parentEmail || '', parentalConsent: age < 16, location:'', bio:'', contactEmail: document.getElementById('signup-email').value.trim(), photoURL:'' });
+            if (parentEmail) {
+                const childName = document.getElementById('signup-name').value.trim();
+                const childEmail = document.getElementById('signup-email').value.trim();
+                await emailjs.send('service_wbf7cqn', 'template_weqpn2m', {
+                    parent_email: parentEmail,
+                    name: childName,
+                    email: childEmail,
+                    title: 'Inscription Oise au Jardin',
+                    message: childName + ' (' + childEmail + ') vient de créer un compte sur Oise au Jardin avec votre adresse e-mail comme contact parental. Si vous n\'avez pas autorisé cette inscription, contactez-nous à ciril8596@gmail.com.',
+                });
+            }
             closeModal('signup');
-        } catch(e) { err.style.display = 'block'; err.textContent = e.message; }
+        } catch(e) { err.style.display='block'; err.textContent = e.code==='auth/email-already-in-use' ? 'Un compte avec cet e-mail existe déjà.' : e.code==='auth/weak-password' ? 'Le mot de passe doit contenir au moins 6 caractères.' : e.message; }
     }
     window.handleLogin = async function(e) {
         e.preventDefault();
@@ -274,6 +364,35 @@
     function declineCookies() { localStorage.setItem('cookieConsent','declined'); document.getElementById('cookie-banner').classList.remove('show'); }
     function openModal(t) { document.getElementById(t+'Modal').classList.add('active'); }
     function closeModal(t) { document.getElementById(t+'Modal').classList.remove('active'); }
+    window.validateModalAge = function() {
+        const year = parseInt(document.getElementById('signup-birthyear').value);
+        const month = parseInt(document.getElementById('signup-birthmonth').value);
+        const day = parseInt(document.getElementById('signup-birthday').value);
+        const err = document.getElementById('signup-error');
+        if (!year || !month || !day) { err.style.display='block'; err.textContent='Veuillez entrer votre date de naissance complète.'; return; }
+        const today = new Date();
+        const birth = new Date(year, month - 1, day);
+        if (birth > today) { err.style.display='block'; err.textContent='Date de naissance invalide.'; return; }
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        if (age < 14) { err.style.display='block'; err.textContent='Vous devez avoir au moins 14 ans pour utiliser cette plateforme.'; return; }
+        ['signup-birthday','signup-birthmonth','signup-birthyear'].forEach(id => {
+            const el = document.getElementById(id);
+            el.readOnly = true;
+            el.style.background = '#f0f0f0';
+            el.style.color = '#888';
+            el.removeAttribute('required');
+        });
+        document.getElementById('modal-validate-btn').style.display = 'none';
+        document.getElementById('modal-step2').style.display = 'block';
+        if (age < 16) {
+            document.getElementById('modal-parental-box').style.display = 'block';
+            document.getElementById('signup-parent-email').required = true;
+            document.getElementById('modal-parental-consent').required = true;
+        }
+        err.style.display = 'none';
+    }
     function switchModal(a,b) { closeModal(a); openModal(b); }
     document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('active'); }));
     const _hash = window.location.hash;

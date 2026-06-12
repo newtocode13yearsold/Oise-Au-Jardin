@@ -5,12 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jardiniers - Oise au Jardin</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c5f2e">
     <link rel="apple-touch-icon" href="images/logo.png">
     <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
     <style>
         .page-header { background: linear-gradient(rgba(0,0,0,0.45),rgba(0,0,0,0.45)),url("./images/lawn.jpg"); background-size:cover; background-position:center; }
+
+        /* ===== VIEW TOGGLE ===== */
+        .view-toggle-bar { background:#fff; border-bottom:1px solid var(--gray100); display:flex; }
+        .vtab { flex:1; padding:14px 20px; font-size:15px; font-weight:700; border:none; background:transparent; cursor:pointer; color:var(--gray400); border-bottom:3px solid transparent; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:7px; }
+        .vtab.active { color:var(--g700); border-bottom-color:var(--g700); }
+        .vtab:hover:not(.active) { color:var(--gray700); background:var(--gray50); }
+
+        /* ===== MAP VIEW ===== */
+        #map-view { display:none; position:relative; }
+        #map-view.show { display:block; }
+        #gardener-map { width:100%; height:calc(100vh - 66px); }
+        #map-view:fullscreen #gardener-map,
+        #map-view:-webkit-full-screen #gardener-map { height:100vh; }
+
+        .map-legend-box { position:absolute; bottom:32px; left:14px; background:rgba(255,255,255,0.97); padding:12px 16px; border-radius:12px; box-shadow:0 3px 14px rgba(0,0,0,0.18); z-index:1000; font-size:13px; pointer-events:none; }
+        .map-leg-item { display:flex; align-items:center; gap:8px; font-weight:600; color:var(--gray700); }
+        .map-leg-item + .map-leg-item { margin-top:8px; }
+        .map-leg-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+        .map-leg-dot.green { background:#28a047; border:2px solid #1a6e32; }
+        .map-leg-dot.orange { background:#e07b30; border:2px solid #a05418; }
+
+        .map-fullscreen-btn { position:absolute; top:12px; right:12px; z-index:1000; background:#fff; border:1.5px solid #d0d0d0; border-radius:8px; padding:9px 16px; cursor:pointer; font-size:13px; font-weight:700; box-shadow:0 2px 10px rgba(0,0,0,0.15); color:var(--gray700); transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+        .map-fullscreen-btn:hover { background:var(--g50); border-color:var(--g700); color:var(--g700); }
+
+        .map-loading-overlay { position:absolute; inset:0; background:rgba(255,255,255,0.85); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:900; gap:14px; font-size:15px; font-weight:600; color:var(--g700); }
+        .map-loading-overlay.hidden { display:none; }
+        .map-spinner { width:36px; height:36px; border:3px solid var(--g100); border-top-color:var(--g700); border-radius:50%; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        .map-pin-popup { font-family:'Inter',sans-serif; font-size:13px; line-height:1.55; min-width:180px; }
+        .map-pin-popup strong { font-size:14px; display:block; margin-bottom:4px; }
+        .map-pin-popup .pp-row { color:#555; margin-bottom:2px; }
+        .map-pin-popup .pp-btn { display:block; margin-top:10px; padding:7px 14px; border:none; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; text-align:center; text-decoration:none; width:100%; }
+        .map-pin-popup .pp-btn-green { background:#2c5f2e; color:#fff; }
+        .map-pin-popup .pp-btn-orange { background:#e07b30; color:#fff; }
     </style>
 </head>
 <body>
@@ -22,7 +58,7 @@
         <div class="nav-menu" id="nav-menu">
             <ul class="nav-links">
                 <li><a href="index.html">Accueil</a></li>
-                <li><a href="gardeners.html">Jardiniers</a></li>
+                <li><a href="gardeners.html" class="active">Jardiniers</a></li>
                 <li><a href="jobs.html">Offres</a></li>
                 <li><div class="msg-badge-wrap"><a href="chat.html">Messages</a><span class="msg-badge" id="msg-badge"></span></div></li>
                 <li><a href="faq.html">FAQ</a></li>
@@ -56,33 +92,56 @@
     <p>Parcourez les jeunes jardiniers disponibles dans votre secteur</p>
 </div>
 
-<div class="filter-section">
-    <h3>🔍 Rechercher & Filtrer les Jardiniers</h3>
-    <div class="filter-bar">
-        <div class="filter-group"><label>Localisation</label><input type="text" id="filter-location" placeholder="ex. Compiègne..."></div>
-        <div class="filter-group"><label>Type de service</label><input type="text" id="filter-service" placeholder="ex. tonte, désherbage..."></div>
-        <div class="filter-group"><label>Prix max/h (€)</label><input type="number" id="filter-max-price" placeholder="ex. 15"></div>
-        <div class="filter-group"><label>Note minimale</label>
-            <select id="filter-stars">
-                <option value="">Toutes les notes</option>
-                <option value="4">4+ étoiles ⭐⭐⭐⭐</option>
-                <option value="3">3+ étoiles ⭐⭐⭐</option>
-                <option value="2">2+ étoiles ⭐⭐</option>
-            </select>
-        </div>
-        <div class="filter-buttons">
-            <button class="filter-btn" onclick="applyFilters()">🔍 Rechercher</button>
-            <button class="clear-btn" onclick="clearFilters()">✕ Effacer</button>
-        </div>
+<!-- VIEW TOGGLE -->
+<div class="view-toggle-bar">
+    <button class="vtab active" id="tab-list" onclick="switchView('list')">📋 Liste</button>
+    <button class="vtab" id="tab-map" onclick="switchView('map')">🗺 Carte</button>
+</div>
+
+<!-- MAP VIEW -->
+<div id="map-view">
+    <div id="gardener-map"></div>
+    <div class="map-legend-box">
+        <div class="map-leg-item"><span class="map-leg-dot green"></span> Jardiniers disponibles</div>
+        <div class="map-leg-item"><span class="map-leg-dot orange"></span> Offres d'emploi</div>
+    </div>
+    <button class="map-fullscreen-btn" id="fullscreen-btn" onclick="toggleMapFullscreen()">⛶ Plein écran</button>
+    <div class="map-loading-overlay" id="map-loading">
+        <div class="map-spinner"></div>
+        <span>Chargement de la carte…</span>
     </div>
 </div>
 
-<div class="section-content">
-    <div style="max-width:1100px;margin:0 auto;">
-        <p class="filter-results" id="filter-results"></p>
-        <button class="post-btn" onclick="openPostModal()">+ Publier ma Disponibilité</button>
-        <p class="login-warning" id="login-warning"></p>
-        <div class="cards-grid" id="gardeners-list"><p class="empty-msg">Chargement des jardiniers...</p></div>
+<!-- LIST VIEW -->
+<div id="list-view">
+    <div class="filter-section">
+        <h3>🔍 Rechercher & Filtrer les Jardiniers</h3>
+        <div class="filter-bar">
+            <div class="filter-group"><label>Localisation</label><input type="text" id="filter-location" placeholder="ex. Compiègne..."></div>
+            <div class="filter-group"><label>Type de service</label><input type="text" id="filter-service" placeholder="ex. tonte, désherbage..."></div>
+            <div class="filter-group"><label>Prix max/h (€)</label><input type="number" id="filter-max-price" placeholder="ex. 15"></div>
+            <div class="filter-group"><label>Note minimale</label>
+                <select id="filter-stars">
+                    <option value="">Toutes les notes</option>
+                    <option value="4">4+ étoiles ⭐⭐⭐⭐</option>
+                    <option value="3">3+ étoiles ⭐⭐⭐</option>
+                    <option value="2">2+ étoiles ⭐⭐</option>
+                </select>
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn" onclick="applyFilters()">🔍 Rechercher</button>
+                <button class="clear-btn" onclick="clearFilters()">✕ Effacer</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-content">
+        <div style="max-width:1100px;margin:0 auto;">
+            <p class="filter-results" id="filter-results"></p>
+            <button class="post-btn" onclick="openPostModal()">+ Publier ma Disponibilité</button>
+            <p class="login-warning" id="login-warning"></p>
+            <div class="cards-grid" id="gardeners-list"><p class="empty-msg">Chargement des jardiniers...</p></div>
+        </div>
     </div>
 </div>
 
@@ -109,6 +168,10 @@
         <p class="info-row" id="popup-location"></p>
         <p class="info-row" id="popup-contact"></p>
         <div class="bio" id="popup-bio"></div>
+        <div id="popup-portfolio-wrap" style="display:none;width:100%;margin-top:16px;">
+            <p style="font-size:13px;font-weight:700;color:#2c5f2e;text-align:left;margin-bottom:8px;">📸 Réalisations</p>
+            <div id="popup-portfolio" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+        </div>
         <button id="msg-btn" style="margin-top:14px;width:100%;padding:10px;background:#2c5f2e;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;display:none;" onclick="goToChat()">💬 Envoyer un message</button>
     </div>
 </div>
@@ -121,6 +184,7 @@
     </div>
 </footer>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -276,6 +340,13 @@
             document.getElementById('popup-location').textContent=data.location?'📍 '+data.location:'📍 Localisation non renseignée';
             document.getElementById('popup-contact').textContent=data.contactEmail?'✉️ '+data.contactEmail:'';
             document.getElementById('popup-bio').textContent=data.bio||'Pas encore de bio.';
+            const portfolio=Array.isArray(data.portfolio)?data.portfolio:[];
+            const pWrap=document.getElementById('popup-portfolio-wrap');
+            const pGrid=document.getElementById('popup-portfolio');
+            if(portfolio.length){
+                pGrid.innerHTML=portfolio.map(u=>`<img src="${u}" alt="Réalisation" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;cursor:pointer;" onclick="window.open('${u}','_blank')">`).join('');
+                pWrap.style.display='block';
+            }else{pGrid.innerHTML='';pWrap.style.display='none';}
             document.getElementById('msg-btn').style.display=(currentUser&&currentUser.uid!==userId)?'block':'none';
             document.getElementById('profilePopup').classList.add('active');
         }catch{alert('Impossible de charger le profil.');}
@@ -306,8 +377,147 @@
         }
     }
     window.logout=async function(){await signOut(auth);location.href='index.html';}
+
+    // ===== MAP INIT =====
+    window.initGardenerMap = async function() {
+        if (typeof L === 'undefined') return;
+        const mapEl = document.getElementById('gardener-map');
+        if (!mapEl) return;
+
+        const map = L.map('gardener-map', { scrollWheelZoom: true, zoomControl: true }).setView([49.40, 2.25], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+        }).addTo(map);
+        window._gMap = map;
+
+        function makeIcon(emoji, color) {
+            return L.divIcon({
+                className: '',
+                html: '<div style="background:'+color+';width:36px;height:36px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;">'+emoji+'</div>',
+                iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -22]
+            });
+        }
+        const gardenerIcon = makeIcon('🌱', '#28a047');
+        const jobIcon = makeIcon('🏡', '#e07b30');
+
+        const cache = {};
+        async function geocode(loc) {
+            if (!loc) return null;
+            const k = loc.trim().toLowerCase();
+            if (cache[k] !== undefined) return cache[k];
+            try {
+                const r = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(loc.trim() + ', Oise, France') + '&format=json&limit=1&accept-language=fr');
+                const d = await r.json();
+                const c = d.length ? [+d[0].lat, +d[0].lon] : null;
+                cache[k] = c;
+                return c;
+            } catch { cache[k] = null; return null; }
+        }
+
+        const delay = ms => new Promise(r => setTimeout(r, ms));
+        const bounds = [];
+
+        // ---- Gardeners ----
+        try {
+            const snap = await getDocs(query(collection(db, 'gardeners'), orderBy('createdAt', 'desc')));
+            for (const s of snap.docs) {
+                const d = s.data();
+                if (!d.location) continue;
+                await delay(320);
+                const c = await geocode(d.location);
+                if (!c) continue;
+                bounds.push(c);
+                const popup = `<div class="map-pin-popup">
+                    <strong>🌱 ${d.name}</strong>
+                    <div class="pp-row">📍 ${d.location}</div>
+                    <div class="pp-row">🛠 ${d.services}</div>
+                    <div class="pp-row">💶 <b>${d.price} €/h</b></div>
+                    <button class="pp-btn pp-btn-green" onclick="window.viewProfile('${d.userId}')">👤 Voir le profil</button>
+                </div>`;
+                L.marker(c, { icon: gardenerIcon }).bindPopup(popup, { maxWidth: 220 }).addTo(map);
+            }
+        } catch(e) { console.warn('Map gardeners:', e); }
+
+        // ---- Job Offers ----
+        try {
+            const snap = await getDocs(query(collection(db, 'jobs'), orderBy('createdAt', 'desc')));
+            for (const s of snap.docs) {
+                const d = s.data();
+                if (!d.location) continue;
+                await delay(320);
+                const c = await geocode(d.location);
+                if (!c) continue;
+                bounds.push(c);
+                const tasks = Array.isArray(d.tasks) ? d.tasks.slice(0, 3).join(' · ') : '';
+                const popup = `<div class="map-pin-popup">
+                    <strong>🏡 Offre de jardinage</strong>
+                    <div class="pp-row">📍 ${d.location}</div>
+                    ${tasks ? '<div class="pp-row">🛠 ' + tasks + '</div>' : ''}
+                    ${d.budget ? '<div class="pp-row">💶 <b>' + d.budget + ' €</b></div>' : ''}
+                    ${d.date ? '<div class="pp-row">📅 ' + d.date + '</div>' : ''}
+                    <a href="jobs.html" class="pp-btn pp-btn-orange">Voir l'offre →</a>
+                </div>`;
+                L.marker(c, { icon: jobIcon }).bindPopup(popup, { maxWidth: 220 }).addTo(map);
+            }
+        } catch(e) { console.warn('Map jobs:', e); }
+
+        // Fit map to all pins if any
+        if (bounds.length > 0) {
+            try { map.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 }); } catch(e) {}
+        }
+
+        // Hide loading overlay
+        const overlay = document.getElementById('map-loading');
+        if (overlay) overlay.classList.add('hidden');
+    };
 </script>
 <script>
+    let _mapInitialized = false;
+
+    window.switchView = function(view) {
+        const listEl = document.getElementById('list-view');
+        const mapEl  = document.getElementById('map-view');
+        const tabList = document.getElementById('tab-list');
+        const tabMap  = document.getElementById('tab-map');
+        if (view === 'map') {
+            listEl.style.display = 'none';
+            mapEl.classList.add('show');
+            tabList.classList.remove('active');
+            tabMap.classList.add('active');
+            if (!_mapInitialized) {
+                _mapInitialized = true;
+                if (window.initGardenerMap) window.initGardenerMap();
+            } else if (window._gMap) {
+                setTimeout(() => window._gMap.invalidateSize(), 50);
+            }
+        } else {
+            listEl.style.display = '';
+            mapEl.classList.remove('show');
+            tabList.classList.add('active');
+            tabMap.classList.remove('active');
+        }
+    };
+
+    window.toggleMapFullscreen = function() {
+        const el = document.getElementById('map-view');
+        if (!document.fullscreenElement) {
+            el.requestFullscreen().catch(() => {});
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
+    document.addEventListener('fullscreenchange', function() {
+        const btn = document.getElementById('fullscreen-btn');
+        if (document.fullscreenElement) {
+            if (btn) btn.textContent = '✕ Quitter le plein écran';
+        } else {
+            if (btn) btn.textContent = '⛶ Plein écran';
+        }
+        if (window._gMap) setTimeout(() => window._gMap.invalidateSize(), 100);
+    });
+
     function toggleMenu(){const m=document.getElementById('nav-menu');const h=document.getElementById('hamburger');m.classList.toggle('open');h.classList.toggle('open');}
     function toggleTranslate(){document.getElementById('translate-dropdown').classList.toggle('open');}
     function setLang(lang){localStorage.setItem('preferredLang',lang);const labels={en:'🇬🇧 English',fr:'🇫🇷 Français',es:'🇪🇸 Español',de:'🇩🇪 Deutsch',it:'🇮🇹 Italiano',nl:'🇳🇱 Nederlands'};document.getElementById('current-lang').textContent=labels[lang];document.getElementById('translate-dropdown').classList.remove('open');setTimeout(()=>{const s=document.querySelector('.goog-te-combo');if(s){s.value=lang;s.dispatchEvent(new Event('change'));}},500);}
